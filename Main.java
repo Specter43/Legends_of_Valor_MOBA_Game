@@ -23,7 +23,7 @@ public class Main {
         }
 
         // Game End Messages
-        mainMenu.announceGameEnd(currentGame);
+        mainMenu.announceGameEnd();
     }
 
     public static void main(String[] args) throws InterruptedException {
