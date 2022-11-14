@@ -23,6 +23,8 @@ public class MainMenu {
         String currentGame = null;
         if (gameSelection.equals("1")) {
             currentGame = "Legends: Monsters and Heroes";
+        } else {
+            exit(0);
         }
         System.out.println(pr.BLUE + "Welcome to " + currentGame + "!" + pr.RESET);
         return currentGame;
@@ -49,7 +51,7 @@ public class MainMenu {
         return game;
     }
 
-    public void announceGameEnd(String currentGame) throws InterruptedException {
+    public void announceGameEnd() throws InterruptedException {
         Scanner in = new Scanner(System.in);
         System.out.print(pr.BLUE + "Would you like to play another game? Y/N: " + pr.RESET);
         String choice = in.nextLine();
