@@ -293,10 +293,6 @@ public class GameLMH extends BattleTurnBasedGame {
                             }
                         }
                     }
-                    //Regain 10% HP and MP at end of each round
-                    currentHero.setHP(currentHero.getHP() * 1.1);
-                    currentHero.setMP(currentHero.getMP() * 1.1);
-                    System.out.print(pr.GREEN + currentHero.getName() + pr.RESET + " has finished the turn! Regain HP and MP by 10%.\n");
                 }
             } else {
                 Random rand = new Random();
@@ -316,11 +312,19 @@ public class GameLMH extends BattleTurnBasedGame {
             setGameOver(true);
             return;
         }
-        // Gain experience and gold
+
+        // Regain health and mana and Gain experience and gold
         for (Hero hero : currentHeroTeam.getTeamMembers()) {
+            // Experience and gold
             hero.setExperience(hero.getExperience()+(2*teamMonster.getTeamSize()));
             System.out.printf(pr.GREEN + "%s"  + pr.RESET + " has gained %d experience!\n", hero.getName(), 2*teamMonster.getTeamSize());
             if (hero.getHP() > 0) {
+                //Regain 10% HP and MP at end of each round
+                hero.setHP(hero.getHP() * 1.1);
+                hero.setMP(hero.getMP() * 1.1);
+
+                // Gain gold
+                System.out.print(pr.GREEN + hero.getName() + pr.RESET + " has finished the turn! Regain HP and MP by 10%.\n");
                 hero.setGold(hero.getGold() + currentHeroTeam.highestLevel()*100);
                 System.out.printf(pr.GREEN + "%s"  + pr.RESET + " has gained %d gold!\n", hero.getName(), currentHeroTeam.highestLevel()*100);
             }

@@ -13,6 +13,10 @@ public class BoardWorldMap extends Board implements BoardFunction {
     private double monsterPercentage;
     private int[] heroPosition;
     private HashMap<String, Market> markets;
+    private int laneWidth;
+    private int inaccessibleWidth;
+    private ArrayList<int[]> heroPositions;
+    private ArrayList<int[]> monsterPositions;
     Printer pr = new Printer();
 
     /**
@@ -24,6 +28,8 @@ public class BoardWorldMap extends Board implements BoardFunction {
         super(h, w);
         this._boardCellHeight = 2;
         this._boardCellWidth = 4;
+        this.laneWidth = 2;
+        this.inaccessibleWidth = 1;
         this.board = new CellLMH[_boardCellHeight*h+1][_boardCellWidth*h+1];
         this.obstaclePercentage = 0.2;
         this.marketPercentage = 0.3;
@@ -80,8 +86,42 @@ public class BoardWorldMap extends Board implements BoardFunction {
                 }
             }
         }
-        // Initialize hero(s), obstacle, markets, and monsters
-        board[1][2].setContent(pr.GREEN +"H" + pr.RESET);
+
+
+        int topRow = 1;
+        int bottomRow = _boardCellHeight*getHeight()-1;
+        // Initialize hero nexus positions
+        for (int i = 0; i < getWidth(); i+=laneWidth+1) {
+            for (int j = 0; j < laneWidth; j++) {
+                board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+1].setContent(pr.BLUE_BG + " " + pr.RESET);
+                board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+2].setContent(pr.BLUE_BG + "N" + pr.RESET);
+                board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+3].setContent(pr.BLUE_BG + " " + pr.RESET);
+            }
+        }
+        // Initialize monster nexus positions
+        for (int i = 0; i < getWidth(); i+=laneWidth+1) {
+            for (int j = 0; j < laneWidth; j++) {
+                board[topRow][_boardCellWidth*i+_boardCellWidth*j+1].setContent(pr.RED_BG + " " + pr.RESET);
+                board[topRow][_boardCellWidth*i+_boardCellWidth*j+2].setContent(pr.RED_BG + "N" + pr.RESET);
+                board[topRow][_boardCellWidth*i+_boardCellWidth*j+3].setContent(pr.RED_BG + " " + pr.RESET);
+            }
+        }
+        // Initialize inaccessible spaces
+        for (int i = laneWidth; i < getWidth(); i+=laneWidth+1) {
+            for (int j = 0; j < getHeight(); j++) {
+                board[_boardCellHeight*j+1][_boardCellWidth*i+1].setContent(pr.WHITE_BG + " " + pr.RESET);
+                board[_boardCellHeight*j+1][_boardCellWidth*i+2].setContent(pr.WHITE_BG + "X" + pr.RESET);
+                board[_boardCellHeight*j+1][_boardCellWidth*i+3].setContent(pr.WHITE_BG + " " + pr.RESET);
+            }
+        }
+        // TODO: Initialize hero positions (random within laneWidth range), in nexus
+
+        // TODO: Initialize monster positions (random within laneWidth range), in nexus
+
+        // TODO: Initialize markets within nexus (laneWidth number of markets)
+
+        // TODO: Initialize bush/cave/koulou (random), REASONABLE, not full, enough is the best
+
         Random rand = new Random();
         int boardSideLength = getHeight();
         int boardSize = boardSideLength * boardSideLength;
@@ -90,11 +130,12 @@ public class BoardWorldMap extends Board implements BoardFunction {
         int numMonsters = (int) Math.floor(boardSize * monsterPercentage);
         int x;
         int y;
+
         for (int i = 0; i < numObstacles; i++) {
             int[] availablePosition = availablePositions.remove(rand.nextInt(availablePositions.size()));
             x = availablePosition[0];
             y = availablePosition[1];
-            board[x][y].setContent(pr.WHITE_BG + "X" + pr.RESET);
+//            board[x][y].setContent(pr.WHITE_BG + "X" + pr.RESET);
             board[x][y].setEmpty(false);
             board[x][y].setObstacle(true);
         }
@@ -102,7 +143,7 @@ public class BoardWorldMap extends Board implements BoardFunction {
             int[] availablePosition = availablePositions.remove(rand.nextInt(availablePositions.size()));
             x = availablePosition[0];
             y = availablePosition[1];
-            board[x][y].setContent(pr.YELLOW + "$" + pr.RESET);
+//            board[x][y].setContent(pr.YELLOW + "$" + pr.RESET);
             markets.put(x + " " + y, new Market(new int[]{x, y}));
             board[x][y].setEmpty(false);
             board[x][y].setMarket(true);
@@ -111,7 +152,7 @@ public class BoardWorldMap extends Board implements BoardFunction {
             int[] availablePosition = availablePositions.remove(rand.nextInt(availablePositions.size()));
             x = availablePosition[0];
             y = availablePosition[1];
-            board[x][y].setContent(pr.RED_BG + "?" + pr.RESET);
+//            board[x][y].setContent(pr.RED_BG + "?" + pr.RESET);
             board[x][y].setEmpty(false);
             board[x][y].setMonster(true);
         }

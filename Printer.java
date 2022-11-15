@@ -10,4 +10,6 @@ public class Printer {
     public final String CYAN = "\033[96;1m";
     public final String RED_BG = "\u001B[41m";
     public final String WHITE_BG = "\u001B[47m";
+
+    public final String BLUE_BG = "\u001B[44m";
 }

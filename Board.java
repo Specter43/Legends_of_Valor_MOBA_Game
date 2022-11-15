@@ -24,4 +24,7 @@ public abstract class Board {
     public int getHeight() {
         return height;
     }
+    public int getWidth() {
+        return width;
+    }
 }
