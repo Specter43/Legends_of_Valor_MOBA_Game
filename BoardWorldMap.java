@@ -11,6 +11,12 @@ public class BoardWorldMap extends Board implements BoardFunction {
     private double obstaclePercentage;
     private double marketPercentage;
     private double monsterPercentage;
+
+    private double bushPercentage;
+
+    private double cavePercentage;
+
+    private double koulouPercentage;
     private int[] heroPosition;
     private HashMap<String, Market> markets;
     private int laneWidth;
@@ -31,6 +37,9 @@ public class BoardWorldMap extends Board implements BoardFunction {
         this.laneWidth = 2;
         this.inaccessibleWidth = 1;
         this.board = new CellLMH[_boardCellHeight*h+1][_boardCellWidth*h+1];
+        this.bushPercentage = 0.2;
+        this.cavePercentage = 0.1;
+        this.koulouPercentage= 0.1;
         this.obstaclePercentage = 0.2;
         this.marketPercentage = 0.3;
         this.monsterPercentage = 0.2;
@@ -78,84 +87,150 @@ public class BoardWorldMap extends Board implements BoardFunction {
     }
 
     public void initializeWorld() {
-        List<int[]> availablePositions = new ArrayList<>();
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                if (i != 0 || j != 0) {
-                    availablePositions.add(new int[]{_boardCellHeight*i+1, _boardCellWidth*j+2});
-                }
-            }
-        }
-
 
         int topRow = 1;
         int bottomRow = _boardCellHeight*getHeight()-1;
-        // Initialize hero nexus positions
+        int numCreature = 0;
+        if (getWidth() % 3 == 0)
+            numCreature = getWidth() / 3;
+        else
+            numCreature = getWidth() / 3 + 1;
+        int[] heroNexusColPos = new int[numCreature * 2];
+        int[] monsterNexusColPos = new int[numCreature * 2];
+        int index = 0;
+        // Initialize hero nexus positions and setup markets
         for (int i = 0; i < getWidth(); i+=laneWidth+1) {
             for (int j = 0; j < laneWidth; j++) {
                 board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+1].setContent(pr.BLUE_BG + " " + pr.RESET);
+                board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+1].setEmpty(false);
+                board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+1].setMarket(true);
+                //markets.put(x + " " + y, new Market(new int[]{x, y}));
                 board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+2].setContent(pr.BLUE_BG + "N" + pr.RESET);
+                board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+2].setEmpty(false);
+                board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+2].setMarket(true);
+                //markets.put(x + " " + y, new Market(new int[]{x, y}));
                 board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+3].setContent(pr.BLUE_BG + " " + pr.RESET);
+                board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+3].setEmpty(false);
+                board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+3].setMarket(true);
+                //markets.put(x + " " + y, new Market(new int[]{x, y}));
+                heroNexusColPos[index] = _boardCellWidth*i+_boardCellWidth*j+1;
+                index++;
             }
         }
         // Initialize monster nexus positions
+        index = 0;
         for (int i = 0; i < getWidth(); i+=laneWidth+1) {
             for (int j = 0; j < laneWidth; j++) {
                 board[topRow][_boardCellWidth*i+_boardCellWidth*j+1].setContent(pr.RED_BG + " " + pr.RESET);
+                board[topRow][_boardCellWidth*i+_boardCellWidth*j+1].setEmpty(false);
                 board[topRow][_boardCellWidth*i+_boardCellWidth*j+2].setContent(pr.RED_BG + "N" + pr.RESET);
+                board[topRow][_boardCellWidth*i+_boardCellWidth*j+2].setEmpty(false);
                 board[topRow][_boardCellWidth*i+_boardCellWidth*j+3].setContent(pr.RED_BG + " " + pr.RESET);
+                board[topRow][_boardCellWidth*i+_boardCellWidth*j+3].setEmpty(false);
+                monsterNexusColPos[index] = _boardCellWidth*i+_boardCellWidth*j+3;
+                index++;
             }
         }
         // Initialize inaccessible spaces
         for (int i = laneWidth; i < getWidth(); i+=laneWidth+1) {
             for (int j = 0; j < getHeight(); j++) {
                 board[_boardCellHeight*j+1][_boardCellWidth*i+1].setContent(pr.WHITE_BG + " " + pr.RESET);
+                board[_boardCellHeight*j+1][_boardCellWidth*i+1].setEmpty(false);
                 board[_boardCellHeight*j+1][_boardCellWidth*i+2].setContent(pr.WHITE_BG + "X" + pr.RESET);
+                board[_boardCellHeight*j+1][_boardCellWidth*i+2].setEmpty(false);
                 board[_boardCellHeight*j+1][_boardCellWidth*i+3].setContent(pr.WHITE_BG + " " + pr.RESET);
+                board[_boardCellHeight*j+1][_boardCellWidth*i+3].setEmpty(false);
             }
         }
-        // TODO: Initialize hero positions (random within laneWidth range), in nexus
-
-        // TODO: Initialize monster positions (random within laneWidth range), in nexus
-
-        // TODO: Initialize markets within nexus (laneWidth number of markets)
-
-        // TODO: Initialize bush/cave/koulou (random), REASONABLE, not full, enough is the best
-
+        // Initialize hero positions (random within laneWidth range), in nexus
         Random rand = new Random();
+        for (int i = 0; i < numCreature; i++) {
+            int rand_pos = rand.nextInt(laneWidth);
+            board[bottomRow][heroNexusColPos[rand_pos + i * 2]].setContent("H");
+            board[bottomRow][heroNexusColPos[rand_pos + i * 2]].setEmpty(false);
+        }
+
+        // Initialize monster positions (random within laneWidth range), in nexus
+        for (int i = 0; i < numCreature; i++) {
+            int rand_pos = rand.nextInt(laneWidth);
+            board[topRow][monsterNexusColPos[rand_pos + i * 2]].setContent("M");
+            board[topRow][monsterNexusColPos[rand_pos + i * 2]].setEmpty(false);
+        }
+
+        // Initialize bush/cave/koulou (random), REASONABLE, not full, enough is the best
         int boardSideLength = getHeight();
         int boardSize = boardSideLength * boardSideLength;
-        int numObstacles = (int) Math.floor(boardSize * obstaclePercentage);
-        int numMarkets = (int) Math.floor(boardSize * marketPercentage);
-        int numMonsters = (int) Math.floor(boardSize * monsterPercentage);
-        int x;
-        int y;
+        int numBush = (int) Math.floor(boardSize * bushPercentage);
+        int numCave = (int) Math.floor(boardSize * cavePercentage);
+        int numKoulou = (int) Math.floor(boardSize * koulouPercentage);
+        int x, y;
 
-        for (int i = 0; i < numObstacles; i++) {
+        // Check number of available space remaining
+        List<int[]> availablePositions = new ArrayList<>();
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                if (board[_boardCellHeight * i + 1][_boardCellWidth * j + 2].isEmpty()) {
+                    availablePositions.add(new int[]{_boardCellHeight*i+1, _boardCellWidth*j+2});
+                }
+            }
+        }
+
+        for (int i = 0; i < numBush; i++) {
             int[] availablePosition = availablePositions.remove(rand.nextInt(availablePositions.size()));
             x = availablePosition[0];
             y = availablePosition[1];
-//            board[x][y].setContent(pr.WHITE_BG + "X" + pr.RESET);
+            board[x][y].setContent(pr.GREEN + "B" + pr.RESET);
             board[x][y].setEmpty(false);
-            board[x][y].setObstacle(true);
+            //board[x][y].setBush(true);
         }
-        for (int i = 0; i < numMarkets; i++) {
+
+        for (int i = 0; i < numCave; i++) {
             int[] availablePosition = availablePositions.remove(rand.nextInt(availablePositions.size()));
             x = availablePosition[0];
             y = availablePosition[1];
-//            board[x][y].setContent(pr.YELLOW + "$" + pr.RESET);
-            markets.put(x + " " + y, new Market(new int[]{x, y}));
+            board[x][y].setContent(pr.YELLOW + "C" + pr.RESET);
             board[x][y].setEmpty(false);
-            board[x][y].setMarket(true);
+            //board[x][y].setCave(true);
         }
-        for (int i = 0; i < numMonsters; i++) {
+
+        for (int i = 0; i < numKoulou; i++) {
             int[] availablePosition = availablePositions.remove(rand.nextInt(availablePositions.size()));
             x = availablePosition[0];
             y = availablePosition[1];
-//            board[x][y].setContent(pr.RED_BG + "?" + pr.RESET);
+            board[x][y].setContent(pr.BLUE + "K" + pr.RESET);
             board[x][y].setEmpty(false);
-            board[x][y].setMonster(true);
+            //board[x][y].setKoulou(true);
         }
+
+//        int numObstacles = (int) Math.floor(boardSize * obstaclePercentage);
+//        int numMarkets = (int) Math.floor(boardSize * marketPercentage);
+//        int numMonsters = (int) Math.floor(boardSize * monsterPercentage);
+//
+//        for (int i = 0; i < numObstacles; i++) {
+//            int[] availablePosition = availablePositions.remove(rand.nextInt(availablePositions.size()));
+//            x = availablePosition[0];
+//            y = availablePosition[1];
+////            board[x][y].setContent(pr.WHITE_BG + "X" + pr.RESET);
+//            //board[x][y].setEmpty(false);
+//            //board[x][y].setObstacle(true);
+//        }
+//        for (int i = 0; i < numMarkets; i++) {
+//            int[] availablePosition = availablePositions.remove(rand.nextInt(availablePositions.size()));
+//            x = availablePosition[0];
+//            y = availablePosition[1];
+////            board[x][y].setContent(pr.YELLOW + "$" + pr.RESET);
+//            //markets.put(x + " " + y, new Market(new int[]{x, y}));
+//            //board[x][y].setEmpty(false);
+//            //board[x][y].setMarket(true);
+//        }
+//        for (int i = 0; i < numMonsters; i++) {
+//            //int[] availablePosition = availablePositions.remove(rand.nextInt(availablePositions.size()));
+//           //x = availablePosition[0];
+//            //y = availablePosition[1];
+////            board[x][y].setContent(pr.RED_BG + "?" + pr.RESET);
+//            //board[x][y].setEmpty(false);
+//            //board[x][y].setMonster(true);
+//        }
     }
 
     @Override
