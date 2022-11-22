@@ -101,12 +101,11 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
                 int x = bottomRow;
                 int y = _boardCellWidth*i+_boardCellWidth*j+2;
                 board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+1] = (T) new CellLVHeroNexus(" ");
-                markets.put(x + " " + y, new Market(new int[]{x, y}));
                 board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+2] = (T) new CellLVHeroNexus("N");
-                markets.put(x + " " + y, new Market(new int[]{x, y}));
                 board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+3] = (T) new CellLVHeroNexus(" ");
+                board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+2].setEmpty(false);
                 markets.put(x + " " + y, new Market(new int[]{x, y}));
-                heroNexusColPos[index] = _boardCellWidth*i+_boardCellWidth*j+1;
+                heroNexusColPos[index] = y;
                 index++;
             }
         }
@@ -117,7 +116,8 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
                 board[topRow][_boardCellWidth*i+_boardCellWidth*j+1] = (T) new CellLVMonsterNexus(" ");
                 board[topRow][_boardCellWidth*i+_boardCellWidth*j+2] = (T) new CellLVMonsterNexus("N");
                 board[topRow][_boardCellWidth*i+_boardCellWidth*j+3] = (T) new CellLVMonsterNexus(" ");
-                monsterNexusColPos[index] = _boardCellWidth*i+_boardCellWidth*j+3;
+                board[topRow][_boardCellWidth*i+_boardCellWidth*j+2].setEmpty(false);
+                monsterNexusColPos[index] = _boardCellWidth*i+_boardCellWidth*j+2;
                 index++;
             }
         }
@@ -125,23 +125,22 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         for (int i = laneWidth; i < getWidth(); i+=laneWidth+1) {
             for (int j = 0; j < getHeight(); j++) {
                 board[_boardCellHeight*j+1][_boardCellWidth*i+1] = (T) new CellLVInaccessible(" ");
-                board[_boardCellHeight*j+1][_boardCellWidth*i+1].setEmpty(false);
                 board[_boardCellHeight*j+1][_boardCellWidth*i+2] = (T) new CellLVInaccessible("X");
-                board[_boardCellHeight*j+1][_boardCellWidth*i+2].setEmpty(false);
                 board[_boardCellHeight*j+1][_boardCellWidth*i+3] = (T) new CellLVInaccessible(" ");
+                board[_boardCellHeight*j+1][_boardCellWidth*i+2].setEmpty(false);
             }
         }
         // Initialize hero positions (random within laneWidth range), in nexus
         Random rand = new Random();
         for (int i = 0; i < numCreature; i++) {
             int rand_pos = rand.nextInt(laneWidth);
-            board[bottomRow][heroNexusColPos[rand_pos + i * 2]].setContent("H");
+            board[bottomRow][heroNexusColPos[rand_pos + i * 2]].setContent(pr.BLUE_BG + "H" + pr.RESET);
         }
 
         // Initialize monster positions (random within laneWidth range), in nexus
         for (int i = 0; i < numCreature; i++) {
             int rand_pos = rand.nextInt(laneWidth);
-            board[topRow][monsterNexusColPos[rand_pos + i * 2]].setContent("M");
+            board[topRow][monsterNexusColPos[rand_pos + i * 2]].setContent(pr.RED_BG + "M" + pr.RESET);
         }
 
         // Initialize bush/cave/koulou (random), REASONABLE, not full, enough is the best
