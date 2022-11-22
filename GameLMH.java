@@ -48,9 +48,9 @@ public class GameLMH extends BattleTurnBasedGame {
             HashMap<String, List<String>> allFireSpells = fileReader.readFile("Legends_Monsters_and_Heroes/FireSpells.txt");
             HashMap<String, List<String>> allIceSpells = fileReader.readFile("Legends_Monsters_and_Heroes/IceSpells.txt");
             HashMap<String, List<String>> allLightningSpells = fileReader.readFile("Legends_Monsters_and_Heroes/LightningSpells.txt");
-            for (String pos : currentWorldMap.getMarkets().keySet()) {
-                currentWorldMap.getMarkets().get(pos).initializeMarket(allWeapons, allArmors, allPotions, allFireSpells, allIceSpells, allLightningSpells);
-            }
+//            for (String pos : currentWorldMap.getMarkets().keySet()) {
+//                currentWorldMap.getMarkets().get(pos).initializeMarket(allWeapons, allArmors, allPotions, allFireSpells, allIceSpells, allLightningSpells);
+//            }
             System.out.println("RULE: The game only ends when all of your team faint. Stay Alive!");
         } else {
             initializeGame();
@@ -61,7 +61,7 @@ public class GameLMH extends BattleTurnBasedGame {
     public String gamePrompt() {
         Scanner in = new Scanner(System.in);
         currentWorldMap.printBoard();
-        if (currentWorldMap.heroAtMarket()) {
+        if (currentWorldMap.heroAtHeroNexus()) {
             System.out.print("Move around with W/A/S/D keys, Q to quit, I for hero status, " + pr.YELLOW + "M for market: " + pr.RESET);
         } else {
             System.out.print("Move around with W/A/S/D keys, Q to quit, I for hero status: ");
@@ -69,7 +69,7 @@ public class GameLMH extends BattleTurnBasedGame {
         String moveLine = in.nextLine();
         while (!GAMEINPUTMAPPING.get("move").contains(moveLine) &&
                !GAMEINPUTMAPPING.get("utility").contains(moveLine)) {
-            if (currentWorldMap.heroAtMarket()) {
+            if (currentWorldMap.heroAtHeroNexus()) {
                 System.out.print("That did not look like a valid choice, please enter W/A/S/D/Q/I/M: ");
             } else {
                 System.out.print("That did not look like a valid choice, please enter W/A/S/D/Q/I: ");
@@ -84,7 +84,7 @@ public class GameLMH extends BattleTurnBasedGame {
             // Can't move logic
             while (!canMove) {
                 System.out.println(pr.RED + "YOU SHALL NOT PASS!"  + pr.RESET);
-                if (currentWorldMap.heroAtMarket()) {
+                if (currentWorldMap.heroAtHeroNexus()) {
                     System.out.print("Move around with W/A/S/D keys, Q to quit, I for hero status, M for market: ");
                 } else {
                     System.out.print("Move around with W/A/S/D keys, Q to quit, I for hero status: ");
@@ -125,7 +125,7 @@ public class GameLMH extends BattleTurnBasedGame {
             else if (moveLine.equals("m") || moveLine.equals("M")) {
                 String marketKey = Integer.toString(currentWorldMap.get_boardCellHeight()*currentWorldMap.getHeroPosition()[0]+1) + " " +
                                    Integer.toString(currentWorldMap.get_boardCellWidth()*currentWorldMap.getHeroPosition()[1]+2);
-                currentWorldMap.getMarkets().get(marketKey).marketPrompt(currentHeroTeam);
+//                currentWorldMap.getMarkets().get(marketKey).marketPrompt(currentHeroTeam);
             }
         }
         return null;

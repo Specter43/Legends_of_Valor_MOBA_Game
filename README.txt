@@ -14,7 +14,7 @@ Board.java: A Class representing a board.
 BoardFunction.java: An Interface restricting behaviors of every board.
 BoardWorldMap.java: A Class representing a world map for Legends: Monsters and Heroes game.
 Cell.java: An abstract class representing a general cell in a board.
-CellLMH.java: A Class representing a cell in Legends: Monsters and Heroes game.
+CellLV.java: A Class representing a cell in Legends: Monsters and Heroes game.
 Equipment.java: An abstract class representing a general equipment.
 EquipmentArmor.java: A Class representing an equipment armor.
 EquipmentWeapon.java: A Class representing an equipment weapon.
