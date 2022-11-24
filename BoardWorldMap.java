@@ -22,7 +22,7 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
     private int laneWidth;
     private int inaccessibleWidth;
     private int[][] heroPositions;
-    private ArrayList<int[]> monsterPositions;
+    private int[][] monsterPositions;
     Printer pr = new Printer();
 
     /**
@@ -36,14 +36,15 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         this._boardCellWidth = 4;
         this.laneWidth = 2;
         this.inaccessibleWidth = 1;
-        this.bushPercentage = 0.2;
-        this.cavePercentage = 0.1;
-        this.koulouPercentage= 0.1;
-        this.obstaclePercentage = 0.2;
-        this.marketPercentage = 0.3;
-        this.monsterPercentage = 0.2;
+        this.bushPercentage = 0.05;
+        this.cavePercentage = 0.05;
+        this.koulouPercentage= 0.05;
+//        this.obstaclePercentage = 0.2;
+//        this.marketPercentage = 0.3;
+//        this.monsterPercentage = 0.2;
         this.heroPosition = new int[]{0, 0};
         this.heroPositions = new int[][]{{h, 0}, {h, 3}, {h, 6}};
+        this.monsterPositions = new int[][]{{0, 0}, {0, 3}, {0, 6}};
         this.markets = new HashMap<String, Market>();
         this.board = (T[][]) new CellLV[_boardCellHeight*h+1][_boardCellWidth*w+1];
     }
@@ -107,7 +108,7 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
                 markets.put(x + " " + y, new Market(new int[]{x, y}));
                 board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+3] = (T) new CellLVHeroNexus(" ");
                 markets.put(x + " " + y, new Market(new int[]{x, y}));
-                heroNexusColPos[index] = _boardCellWidth*i+_boardCellWidth*j+1;
+                heroNexusColPos[index] = _boardCellWidth*i+_boardCellWidth*j+2;
                 index++;
             }
         }
@@ -118,7 +119,7 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
                 board[topRow][_boardCellWidth*i+_boardCellWidth*j+1] = (T) new CellLVMonsterNexus(" ");
                 board[topRow][_boardCellWidth*i+_boardCellWidth*j+2] = (T) new CellLVMonsterNexus("N");
                 board[topRow][_boardCellWidth*i+_boardCellWidth*j+3] = (T) new CellLVMonsterNexus(" ");
-                monsterNexusColPos[index] = _boardCellWidth*i+_boardCellWidth*j+3;
+                monsterNexusColPos[index] = _boardCellWidth*i+_boardCellWidth*j+2;
                 index++;
             }
         }
@@ -136,14 +137,15 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         Random rand = new Random();
         for (int i = 0; i < numCreature; i++) {
             int rand_pos = rand.nextInt(laneWidth);
-            board[bottomRow][heroNexusColPos[rand_pos + i * 2]].setContent("H");
+            board[bottomRow][heroNexusColPos[rand_pos + i * 2]].setContent(pr.BLUE_BG + "H" + pr.RESET);
             heroPositions[i] = new int[]{bottomRow, heroNexusColPos[rand_pos + i * 2]};
         }
 
         // Initialize monster positions (random within laneWidth range), in nexus
         for (int i = 0; i < numCreature; i++) {
             int rand_pos = rand.nextInt(laneWidth);
-            board[topRow][monsterNexusColPos[rand_pos + i * 2]].setContent("M");
+            board[topRow][monsterNexusColPos[rand_pos + i * 2]].setContent(pr.RED_BG + "M" + pr.RESET);
+            monsterPositions[i] = new int[]{topRow, heroNexusColPos[rand_pos + i * 2]};
         }
 
         // Initialize bush/cave/koulou (random), REASONABLE, not full, enough is the best

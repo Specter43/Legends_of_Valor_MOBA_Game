@@ -19,7 +19,7 @@ Equipment.java: An abstract class representing a general equipment.
 EquipmentArmor.java: A Class representing an equipment armor.
 EquipmentWeapon.java: A Class representing an equipment weapon.
 Game.java: An abstract class representing a general game.
-GameLMH.java: A Class representing an instance of a Legends: Monsters and Heroes game.
+GameLV.java: A Class representing an instance of a Legends: Monsters and Heroes game.
 Hero.java: An abstract class representing a general hero.
 HeroArmors.java: A class representing the armors a hero is wearing.
 HeroPaladin.java: A Class representing a Paladin.

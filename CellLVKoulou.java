@@ -4,7 +4,7 @@ public class CellLVKoulou extends CellLV {
 
     public CellLVKoulou(Object content) {
         super("");
-        setContent(pr.BLUE + content + pr.RESET);
+        setContent(pr.CYAN + content + pr.RESET);
         strengthBonus = 0.15;
     }
 }

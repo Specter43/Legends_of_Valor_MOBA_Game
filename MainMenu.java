@@ -44,7 +44,7 @@ public class MainMenu {
         Game game = null;
         switch (currentGame) {
             case "Legends: Monsters and Heroes":
-                game = new GameLMH((TeamHero) team);
+                game = new GameLV((TeamHero) team);
                 game.initializeGame();
                 break;
         }
