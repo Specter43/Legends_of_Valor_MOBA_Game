@@ -21,7 +21,7 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
     private HashMap<String, Market> markets;
     private int laneWidth;
     private int inaccessibleWidth;
-    private ArrayList<int[]> heroPositions;
+    private int[][] heroPositions;
     private ArrayList<int[]> monsterPositions;
     Printer pr = new Printer();
 
@@ -43,6 +43,7 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         this.marketPercentage = 0.3;
         this.monsterPercentage = 0.2;
         this.heroPosition = new int[]{0, 0};
+        this.heroPositions = new int[][]{{h, 0}, {h, 3}, {h, 6}};
         this.markets = new HashMap<String, Market>();
         this.board = (T[][]) new CellLV[_boardCellHeight*h+1][_boardCellWidth*w+1];
     }
@@ -136,6 +137,7 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         for (int i = 0; i < numCreature; i++) {
             int rand_pos = rand.nextInt(laneWidth);
             board[bottomRow][heroNexusColPos[rand_pos + i * 2]].setContent("H");
+            heroPositions[i] = new int[]{bottomRow, heroNexusColPos[rand_pos + i * 2]};
         }
 
         // Initialize monster positions (random within laneWidth range), in nexus
@@ -154,7 +156,7 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
 
         // Check number of available space remaining
         List<int[]> availablePositions = new ArrayList<>();
-        for (int i = 0; i < height; i++) {
+        for (int i = 1; i < height-1; i++) {
             for (int j = 0; j < width; j++) {
                 if (board[_boardCellHeight * i + 1][_boardCellWidth * j + 2].isEmpty()) {
                     availablePositions.add(new int[]{_boardCellHeight*i+1, _boardCellWidth*j+2});
@@ -283,6 +285,10 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
             return "Empty";
         }
         return "Market";
+    }
+
+    public void monsterMove() {
+
     }
 
     public boolean heroAtHeroNexus() {
