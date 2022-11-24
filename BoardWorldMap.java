@@ -228,31 +228,31 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         }
     }
 
-    public int[] calculateNextPosition(String moveDirection) {
+    public int[] calculateNextPosition(String moveDirection, int playerIndex) {
         int[] newPos = new int[2];
         switch (moveDirection) {
             case "w":
             case "W":
-                newPos = new int[]{heroPosition[0] - 1, heroPosition[1]};
+                newPos = new int[]{heroPositions[playerIndex][0] - 1, heroPositions[playerIndex][1]};
                 break;
             case "a":
             case "A":
-                newPos = new int[]{heroPosition[0], heroPosition[1] - 1};
+                newPos = new int[]{heroPositions[playerIndex][0], heroPositions[playerIndex][1] - 1};
                 break;
             case "s":
             case "S":
-                newPos = new int[]{heroPosition[0] + 1, heroPosition[1]};
+                newPos = new int[]{heroPositions[playerIndex][0] + 1, heroPositions[playerIndex][1]};
                 break;
             case "d":
             case "D":
-                newPos = new int[]{heroPosition[0], heroPosition[1] + 1};
+                newPos = new int[]{heroPositions[playerIndex][0], heroPositions[playerIndex][1] + 1};
                 break;
         }
         return newPos;
     }
 
-    public boolean heroCanMove(String moveDirection) {
-        int[] newPos = calculateNextPosition(moveDirection);
+    public boolean heroCanMove(String moveDirection, int heroIndex) {
+        int[] newPos = calculateNextPosition(moveDirection, heroIndex);
         int new_x = _boardCellHeight*newPos[0]+1;
         int new_y = _boardCellWidth*newPos[1]+2;
         if (newPos[0] < 0 || newPos[0] >= height || newPos[1] < 0 || newPos[1] >= width) {
@@ -262,24 +262,30 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         return newCell.isEmpty() || newCell.isMarket() || newCell.isMonster();
     }
 
-    public String heroMove(String moveDirection) {
-        int[] newPos = calculateNextPosition(moveDirection);
+    public String heroMove(String moveDirection, int heroIndex) {
+        int[] newPos = calculateNextPosition(moveDirection, heroIndex);
+        int old_x = _boardCellHeight*heroPositions[heroIndex][0]+1;
+        int old_y = _boardCellWidth*heroPositions[heroIndex][1]+2;
         int new_x = _boardCellHeight*newPos[0]+1;
         int new_y = _boardCellWidth*newPos[1]+2;
+
+        // Restore old positions
         if (heroAtHeroNexus()) {
-            board[_boardCellHeight* heroPosition[0]+1][_boardCellWidth* heroPosition[1]+2].setContent(pr.BLUE_BG + "N" + pr.RESET);
+            board[old_x][old_y].setContent(pr.BLUE_BG + "N" + pr.RESET);
         } else if (heroAtMonsterNexus()) {
-            board[_boardCellHeight* heroPosition[0]+1][_boardCellWidth* heroPosition[1]+2].setContent(pr.RED_BG + "N" + pr.RESET);
+            board[old_x][old_y].setContent(pr.RED_BG + "N" + pr.RESET);
         } else if (heroAtBush()) {
-            board[_boardCellHeight* heroPosition[0]+1][_boardCellWidth* heroPosition[1]+2].setContent(pr.GREEN + "B" + pr.RESET);
+            board[old_x][old_y].setContent(pr.GREEN + "B" + pr.RESET);
         } else if (heroAtCave()) {
-            board[_boardCellHeight* heroPosition[0]+1][_boardCellWidth* heroPosition[1]+2].setContent(pr.GREEN + "C" + pr.RESET);
+            board[old_x][old_y].setContent(pr.YELLOW + "C" + pr.RESET);
         } else if (heroAtKoulou()) {
-            board[_boardCellHeight* heroPosition[0]+1][_boardCellWidth* heroPosition[1]+2].setContent(pr.GREEN + "K" + pr.RESET);
+            board[old_x][old_y].setContent(pr.CYAN + "K" + pr.RESET);
         } else {
-            board[_boardCellHeight* heroPosition[0]+1][_boardCellWidth* heroPosition[1]+2].setContent(" ");
+            board[old_x][old_y].setContent(" ");
         }
-        board[new_x][new_y].setContent(pr.GREEN +"H" + pr.RESET);
+
+        // Proceed to new position
+        board[new_x][new_y].setContent(pr.GREEN + "H" + pr.RESET);
         heroPosition = newPos;
         if (board[new_x][new_y].isMonster()) {
             return "Monster";

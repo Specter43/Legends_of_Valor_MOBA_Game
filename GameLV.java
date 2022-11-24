@@ -13,7 +13,7 @@ public class GameLV extends BattleTurnBasedGame {
 
     private BoardWorldMap currentWorldMap;
     private TeamHero currentHeroTeam;
-    private BattleQueue currentBattleQueue;
+    private QueueBattle currentQueueBattle;
     private double encounterBattleChance;
 
     public GameLV(TeamHero currentHeroTeam) {
@@ -29,11 +29,14 @@ public class GameLV extends BattleTurnBasedGame {
         this.currentWorldMap.initializeWorld();
         this.currentWorldMap.printBoard();
         System.out.println(pr.BLUE + "Welcome to this new world full of opportunity, danger, and of course, FUN! ENJOY!" + pr.RESET);
-        System.out.println(pr.GREEN +"H" + pr.RESET + " : This represents your team and they will be starting at the ? North West Corner.");
-        System.out.println(pr.WHITE_BG +"X" + pr.RESET + " : This represents terrains of the world that have seen no one crossing them over the eons.");
-        System.out.println(pr.YELLOW +"$" + pr.RESET + " : This represents markets spread across the world, they trade supplies and loots.");
-        System.out.println(pr.RED_BG +"?" + pr.RESET + " : This represents an known monster group, your team HAS TO battle once encountered.");
-        System.out.println(pr.GREEN +"''" + pr.RESET + ": This represents an unknown place, your team MAY encounter a battle once stepped in.");
+        System.out.println(pr.BLUE_BG + "N" + pr.RESET + " : This represents an ally nexus, your teams spawn and can trade here.");
+        System.out.println(pr.RED_BG + "N" + pr.RESET + " : This represents an enemy nexus, monster teams spawn here.");
+        System.out.println(pr.GREEN + "H" + pr.RESET + " : This represents your teams and they will be starting at their Nexuses.");
+        System.out.println(pr.GREEN + "B" + pr.RESET + " : This represents a bush area, teams here get a bonus of their dexterity.");
+        System.out.println(pr.YELLOW + "C" + pr.RESET + " : This represents a cave area, teams here get a bonus of their agility.");
+        System.out.println(pr.GREEN + "K" + pr.RESET + " : This represents a koulou area, teams here get a bonus of their strength.");
+        System.out.println(pr.WHITE_BG + "X" + pr.RESET + " : This represents terrains of the world that have seen no one crossing them over the eons.");
+        System.out.println(pr.GREEN + "''" + pr.RESET + ": This represents an unknown place, your team MAY encounter a battle once stepped in.");
         System.out.print("Do you think this is a reasonable world to play? Enter N to regenerate a world, Y to adventure: ");
         String confirmLine = in.nextLine();
         while (!confirmLine.equals("Y") && !confirmLine.equals("N")) {
@@ -143,12 +146,12 @@ public class GameLV extends BattleTurnBasedGame {
         System.out.println();
 
         // Initialize Battle Queue
-        BattleQueue battleQueue = new BattleQueue(currentHeroTeam, teamMonster);
-        this.currentBattleQueue = battleQueue;
+        QueueBattle queueBattle = new QueueBattle(currentHeroTeam, teamMonster);
+        this.currentQueueBattle = queueBattle;
 
         // Battle takes turns
         while (!currentHeroTeam.allHeroesFainted() && !teamMonster.allMonstersFainted()) {
-            ArrayList<Object> currentRole = battleQueue.nextTurn();
+            ArrayList<Object> currentRole = queueBattle.nextTurn();
             if (currentRole.get(0).equals("Hero")) {
                 Hero currentHero = (Hero) currentRole.get(1);
                 if (currentHero.getHP() > 0) {

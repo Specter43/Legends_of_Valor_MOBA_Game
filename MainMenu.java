@@ -13,7 +13,7 @@ public class MainMenu {
      */
     public String selectGame() {
         Scanner in = new Scanner(System.in);
-        System.out.print(pr.BLUE + "Good Day! Which game are we playing today? Type 1 for Legends: Monsters and Heroes or EXIT to exit game:  " + pr.RESET);
+        System.out.print(pr.BLUE + "Good Day! Which game are we playing today? Type 1 for Legends of Valor or EXIT to exit game:  " + pr.RESET);
         String gameSelection = in.nextLine();
         while (!gameSelection.equals("1") &&
                !gameSelection.equals("EXIT")) {
@@ -22,7 +22,7 @@ public class MainMenu {
         }
         String currentGame = null;
         if (gameSelection.equals("1")) {
-            currentGame = "Legends: Monsters and Heroes";
+            currentGame = "Legends of Valor";
         } else {
             exit(0);
         }
@@ -32,7 +32,7 @@ public class MainMenu {
 
     public Team<?> selectTeamMembers(String currentGame) {
         switch (currentGame) {
-            case "Legends: Monsters and Heroes":
+            case "Legends of Valor":
                 TeamHero team = new TeamHero("Heroes");
                 team.initializeTeamHeroes();
                 return team;
@@ -43,7 +43,7 @@ public class MainMenu {
     public Game createGame(String currentGame, Team<?> team) {
         Game game = null;
         switch (currentGame) {
-            case "Legends: Monsters and Heroes":
+            case "Legends of Valor":
                 game = new GameLV((TeamHero) team);
                 game.initializeGame();
                 break;

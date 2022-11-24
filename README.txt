@@ -8,7 +8,7 @@
 ## Files
 ---------------------------------------------------------------------------
 Attack.java: An Interface to instruct that a Role class should be able to attack.
-BattleQueue.java: A Class representing a queue for turn based battle game.
+QueueBattle.java: A Class representing a queue for turn based battle game.
 BattleTurnBasedGame.java: An abstract class representing a turn based battle game.
 Board.java: A Class representing a board.
 BoardFunction.java: An Interface restricting behaviors of every board.
