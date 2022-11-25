@@ -64,72 +64,80 @@ public class GameLV extends BattleTurnBasedGame {
     public String gamePrompt() {
         Scanner in = new Scanner(System.in);
         currentWorldMap.printBoard();
-        if (currentWorldMap.heroAtHeroNexus()) {
-            System.out.print("Move around with W/A/S/D keys, Q to quit, I for hero status, " + pr.YELLOW + "M for market: " + pr.RESET);
-        } else {
-            System.out.print("Move around with W/A/S/D keys, Q to quit, I for hero status: ");
-        }
-        String moveLine = in.nextLine();
-        while (!GAMEINPUTMAPPING.get("move").contains(moveLine) &&
-               !GAMEINPUTMAPPING.get("utility").contains(moveLine)) {
+        int heroIndex = 0;
+        while(!isGameOver()) {
             if (currentWorldMap.heroAtHeroNexus()) {
-                System.out.print("That did not look like a valid choice, please enter W/A/S/D/Q/I/M: ");
+                System.out.print("Move around with W/A/S/D keys, Q to quit, I for hero status, " + pr.YELLOW + "M for market: " + pr.RESET);
             } else {
-                System.out.print("That did not look like a valid choice, please enter W/A/S/D/Q/I: ");
+                System.out.print("Move around with W/A/S/D keys, Q to quit, I for hero status: ");
             }
-            moveLine = in.nextLine();
-        }
-
-        // Move
-        if (GAMEINPUTMAPPING.get("move").contains(moveLine)) {
-            boolean canMove = currentWorldMap.heroCanMove(moveLine);
-
-            // Can't move logic
-            while (!canMove) {
-                System.out.println(pr.RED + "YOU SHALL NOT PASS!"  + pr.RESET);
+            String moveLine = in.nextLine();
+            while (!GAMEINPUTMAPPING.get("move").contains(moveLine) &&
+                    !GAMEINPUTMAPPING.get("utility").contains(moveLine)) {
                 if (currentWorldMap.heroAtHeroNexus()) {
-                    System.out.print("Move around with W/A/S/D keys, Q to quit, I for hero status, M for market: ");
+                    System.out.print("That did not look like a valid choice, please enter W/A/S/D/Q/I/M: ");
                 } else {
-                    System.out.print("Move around with W/A/S/D keys, Q to quit, I for hero status: ");
+                    System.out.print("That did not look like a valid choice, please enter W/A/S/D/Q/I: ");
                 }
                 moveLine = in.nextLine();
-                canMove = currentWorldMap.heroCanMove(moveLine);
             }
 
-            // Move logic
-            String moveTo = currentWorldMap.heroMove(moveLine);
-            boolean encounterBattle = false;
-            if (moveTo.equals("Monster")) {
-                encounterBattle = true;
-            } else if (moveTo.equals("Empty")) {
-                Random rand = new Random();
-                if (rand.nextInt(100) < encounterBattleChance*100) {
+            // Move
+            if (GAMEINPUTMAPPING.get("move").contains(moveLine)) {
+                boolean canMove = currentWorldMap.heroCanMove(moveLine, heroIndex);
+
+                // Can't move logic
+                while (!canMove) {
+                    System.out.println(pr.RED + "YOU SHALL NOT PASS!"  + pr.RESET);
+                    if (currentWorldMap.heroAtHeroNexus()) {
+                        System.out.print("Move around with W/A/S/D keys, Q to quit, I for hero status, M for market: ");
+                    } else {
+                        System.out.print("Move around with W/A/S/D keys, Q to quit, I for hero status: ");
+                    }
+                    moveLine = in.nextLine();
+                    canMove = currentWorldMap.heroCanMove(moveLine, heroIndex);
+                }
+
+                // Move logic
+                String moveTo = currentWorldMap.heroMove(moveLine, heroIndex);
+                boolean encounterBattle = false;
+                if (moveTo.equals("Monster")) {
                     encounterBattle = true;
+                } else if (moveTo.equals("Empty")) {
+                    Random rand = new Random();
+                    if (rand.nextInt(100) < encounterBattleChance*100) {
+                        encounterBattle = true;
+                    }
+                }
+                if (encounterBattle) {
+                    //battlePrompt();
                 }
             }
-            if (encounterBattle) {
-                battlePrompt();
-            }
-        }
+            // Utility
+            else if (GAMEINPUTMAPPING.get("utility").contains(moveLine)) {
+                // Quit game
+                if (moveLine.equals("q") || moveLine.equals("Q")) {
+                    exit(0);
+                }
 
-        // Utility
-        else if (GAMEINPUTMAPPING.get("utility").contains(moveLine)) {
-            // Quit game
-            if (moveLine.equals("q") || moveLine.equals("Q")) {
-                exit(0);
-            }
+                // Heroes Info
+                else if (moveLine.equals("i") || moveLine.equals("I")) {
+                    currentHeroTeam.showTeamStatus();
+                }
 
-            // Heroes Info
-            else if (moveLine.equals("i") || moveLine.equals("I")) {
-                currentHeroTeam.showTeamStatus();
-            }
-
-            // Market
-            else if (moveLine.equals("m") || moveLine.equals("M")) {
-                String marketKey = Integer.toString(currentWorldMap.get_boardCellHeight()*currentWorldMap.getHeroPosition()[0]+1) + " " +
-                                   Integer.toString(currentWorldMap.get_boardCellWidth()*currentWorldMap.getHeroPosition()[1]+2);
+                // Market
+                else if (moveLine.equals("m") || moveLine.equals("M")) {
+                    String marketKey = Integer.toString(currentWorldMap.get_boardCellHeight()*currentWorldMap.getHeroPosition()[0]+1) + " " +
+                            Integer.toString(currentWorldMap.get_boardCellWidth()*currentWorldMap.getHeroPosition()[1]+2);
 //                currentWorldMap.getMarkets().get(marketKey).marketPrompt(currentHeroTeam);
+                }
             }
+            //TODO: heroIndex and i are fixed
+            heroIndex++;
+            if (heroIndex > 2) break;
+        }
+        for (int i = 0; i < 3; i++) {
+            currentWorldMap.monsterMove(i);
         }
         return null;
     }
