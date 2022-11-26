@@ -7,4 +7,12 @@ public class CellLVKoulou extends CellLV {
         setContent(pr.CYAN + content + pr.RESET);
         strengthBonus = 0.15;
     }
+
+    public void buff(Hero hero) {
+        hero.setStrength(hero.getStrength() * (1+strengthBonus));
+    }
+
+    public void removeBuff(Hero hero) {
+        hero.setStrength(hero.getStrength() * (1.0/1.15));
+    }
 }

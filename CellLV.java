@@ -2,17 +2,12 @@
  * A Class representing a cell in Legends: Monsters and Heroes game.
  */
 public abstract class CellLV extends Cell {
-    private boolean isObstacle;
-    private boolean isMarket;
+    private boolean isHero;
     private boolean isMonster;
     private boolean isHeroNexus;
-
     private boolean isMonsterNexus;
-
     private boolean isCave;
-
     private boolean isBush;
-
     private boolean isKoulou;
 
     public CellLV(Object content) {
@@ -26,8 +21,6 @@ public abstract class CellLV extends Cell {
     public void setHeroNexus(boolean heroNexus) {
         isHeroNexus = heroNexus;
     }
-
-
     public boolean isMonsterNexus() {
         return isMonsterNexus;
     }
@@ -60,20 +53,12 @@ public abstract class CellLV extends Cell {
         isKoulou = koulou;
     }
 
-    public boolean isObstacle() {
-        return isObstacle;
+    public boolean isHero() {
+        return isHero;
     }
 
-    public void setObstacle(boolean obstacle) {
-        isObstacle = obstacle;
-    }
-
-    public boolean isMarket() {
-        return isMarket;
-    }
-
-    public void setMarket(boolean market) {
-        isMarket = market;
+    public void setHero(boolean hero) {
+        isHero = hero;
     }
 
     public boolean isMonster() {

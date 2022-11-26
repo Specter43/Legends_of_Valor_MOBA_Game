@@ -13,7 +13,7 @@ public class MainMenu {
      */
     public String selectGame() {
         Scanner in = new Scanner(System.in);
-        System.out.print(pr.BLUE + "Good Day! Which game are we playing today? Type 1 for Legends of Valor or EXIT to exit game:  " + pr.RESET);
+        System.out.print("Good Day! Which game are we playing today? Type " + pr.BLUE + "1 for Legends of Valor" + pr.RESET + " or EXIT to exit game:  ");
         String gameSelection = in.nextLine();
         while (!gameSelection.equals("1") &&
                !gameSelection.equals("EXIT")) {
@@ -26,7 +26,7 @@ public class MainMenu {
         } else {
             exit(0);
         }
-        System.out.println(pr.BLUE + "Welcome to " + currentGame + "!" + pr.RESET);
+        System.out.println("Welcome to " + pr.BLUE + currentGame + "!" + pr.RESET);
         return currentGame;
     }
 

@@ -16,7 +16,7 @@ public class Market {
     }
 
     public void initializeMarket(HashMap<String, List<String>> allWeapons, HashMap<String, List<String>> allArmors, HashMap<String, List<String>> allPotions, HashMap<String, List<String>> allFireSpells, HashMap<String, List<String>> allIceSpells, HashMap<String, List<String>> allLightningSpells) {
-        double itemPortion = 0.3;
+        double itemPortion = 0.5;
         int[] weaponIndices = IntStream.range(0, (int) Math.ceil(itemPortion*allWeapons.size())).map(i -> ThreadLocalRandom.current().nextInt(allWeapons.get("Name").size())).toArray();
         for (int i : weaponIndices) {
             EquipmentWeapon weapon = new EquipmentWeapon(allWeapons.get("Name").get(i),

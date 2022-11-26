@@ -1,4 +1,6 @@
 import java.util.*;
+import java.util.stream.Collectors;
+
 import static java.lang.System.exit;
 
 /**
@@ -7,7 +9,7 @@ import static java.lang.System.exit;
 public class GameLV extends BattleTurnBasedGame {
     private static final HashMap<String, ArrayList<String>> GAMEINPUTMAPPING = new HashMap<String, ArrayList<String>>() {{
         put("move", new ArrayList<String>(){{add("w"); add("W"); add("a"); add("A"); add("s"); add("S"); add("d"); add("D");}});
-        put("utility", new ArrayList<String>(){{add("q"); add("Q"); add("i"); add("I"); add("m"); add("M");}});
+        put("utility", new ArrayList<String>(){{add("b"); add("B"); add("q"); add("Q"); add("i"); add("I"); add("m"); add("M");}});
     }};
     Printer pr = new Printer();
 
@@ -29,12 +31,12 @@ public class GameLV extends BattleTurnBasedGame {
         this.currentWorldMap.initializeWorld();
         this.currentWorldMap.printBoard();
         System.out.println(pr.BLUE + "Welcome to this new world full of opportunity, danger, and of course, FUN! ENJOY!" + pr.RESET);
-        System.out.println(pr.BLUE_BG + "N" + pr.RESET + " : This represents an ally nexus, your teams spawn and can trade here.");
-        System.out.println(pr.RED_BG + "N" + pr.RESET + " : This represents an enemy nexus, monster teams spawn here.");
-        System.out.println(pr.GREEN + "H" + pr.RESET + " : This represents your teams and they will be starting at their Nexuses.");
+        System.out.println(pr.PURPLE + "H" + pr.RESET + " : This represents your teams and they will be starting at their Nexuses.");
         System.out.println(pr.GREEN + "B" + pr.RESET + " : This represents a bush area, teams here get a bonus of their dexterity.");
         System.out.println(pr.YELLOW + "C" + pr.RESET + " : This represents a cave area, teams here get a bonus of their agility.");
-        System.out.println(pr.GREEN + "K" + pr.RESET + " : This represents a koulou area, teams here get a bonus of their strength.");
+        System.out.println(pr.CYAN + "K" + pr.RESET + " : This represents a koulou area, teams here get a bonus of their strength.");
+        System.out.println(pr.BLUE_BG + "N" + pr.RESET + " : This represents an ally nexus, your teams spawn and can trade here.");
+        System.out.println(pr.RED_BG + "N" + pr.RESET + " : This represents an enemy nexus, monster teams spawn here.");
         System.out.println(pr.WHITE_BG + "X" + pr.RESET + " : This represents terrains of the world that have seen no one crossing them over the eons.");
         System.out.println(pr.GREEN + "''" + pr.RESET + ": This represents an unknown place, your team MAY encounter a battle once stepped in.");
         System.out.print("Do you think this is a reasonable world to play? Enter N to regenerate a world, Y to adventure: ");
@@ -43,6 +45,7 @@ public class GameLV extends BattleTurnBasedGame {
             System.out.print("That did not look like a valid choice, please re-enter Y/N: ");
             confirmLine = in.nextLine();
         }
+        // Initialize Markets once map confirmed
         if (confirmLine.equals("Y")) {
             LMHFileReader fileReader = new LMHFileReader();
             HashMap<String, List<String>> allWeapons = fileReader.readFile("Legends_Monsters_and_Heroes/Weaponry.txt");
@@ -51,11 +54,14 @@ public class GameLV extends BattleTurnBasedGame {
             HashMap<String, List<String>> allFireSpells = fileReader.readFile("Legends_Monsters_and_Heroes/FireSpells.txt");
             HashMap<String, List<String>> allIceSpells = fileReader.readFile("Legends_Monsters_and_Heroes/IceSpells.txt");
             HashMap<String, List<String>> allLightningSpells = fileReader.readFile("Legends_Monsters_and_Heroes/LightningSpells.txt");
-//            for (String pos : currentWorldMap.getMarkets().keySet()) {
-//                currentWorldMap.getMarkets().get(pos).initializeMarket(allWeapons, allArmors, allPotions, allFireSpells, allIceSpells, allLightningSpells);
-//            }
+            for (String pos : new ArrayList<String>(currentWorldMap.getMarkets().keySet())) {
+                Market market = (Market) currentWorldMap.getMarkets().get(pos);
+                market.initializeMarket(allWeapons, allArmors, allPotions, allFireSpells, allIceSpells, allLightningSpells);
+            }
             System.out.println("RULE: The game only ends when all of your team faint. Stay Alive!");
-        } else {
+        }
+        // Re-initialize map
+        else {
             initializeGame();
         }
     }
@@ -66,18 +72,18 @@ public class GameLV extends BattleTurnBasedGame {
         currentWorldMap.printBoard();
         int heroIndex = 0;
         while(!isGameOver()) {
-            if (currentWorldMap.heroAtHeroNexus()) {
-                System.out.print("Move around with W/A/S/D keys, Q to quit, I for hero status, " + pr.YELLOW + "M for market: " + pr.RESET);
+            if (currentWorldMap.heroAtHeroNexus(heroIndex)) {
+                System.out.printf(pr.GREEN + "%s" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, Q to quit, I for hero status, " + pr.YELLOW + "M for market: " + pr.RESET, currentHeroTeam.getTeamMembers().get(heroIndex).getName());
             } else {
-                System.out.print("Move around with W/A/S/D keys, Q to quit, I for hero status: ");
+                System.out.printf(pr.GREEN + "%s" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, " + pr.BLUE + "B to recall" + pr.RESET + ", Q to quit, I for hero status: ", currentHeroTeam.getTeamMembers().get(heroIndex).getName());
             }
             String moveLine = in.nextLine();
             while (!GAMEINPUTMAPPING.get("move").contains(moveLine) &&
                     !GAMEINPUTMAPPING.get("utility").contains(moveLine)) {
-                if (currentWorldMap.heroAtHeroNexus()) {
+                if (currentWorldMap.heroAtHeroNexus(heroIndex)) {
                     System.out.print("That did not look like a valid choice, please enter W/A/S/D/Q/I/M: ");
                 } else {
-                    System.out.print("That did not look like a valid choice, please enter W/A/S/D/Q/I: ");
+                    System.out.print("That did not look like a valid choice, please enter W/A/S/D/B/Q/I: ");
                 }
                 moveLine = in.nextLine();
             }
@@ -89,32 +95,40 @@ public class GameLV extends BattleTurnBasedGame {
                 // Can't move logic
                 while (!canMove) {
                     System.out.println(pr.RED + "YOU SHALL NOT PASS!"  + pr.RESET);
-                    if (currentWorldMap.heroAtHeroNexus()) {
-                        System.out.print("Move around with W/A/S/D keys, Q to quit, I for hero status, M for market: ");
+                    if (currentWorldMap.heroAtHeroNexus(heroIndex)) {
+                        System.out.printf(pr.GREEN + "%s" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, Q to quit, I for hero status, " + pr.YELLOW + "M for market: " + pr.RESET, currentHeroTeam.getTeamMembers().get(heroIndex).getName());
                     } else {
-                        System.out.print("Move around with W/A/S/D keys, Q to quit, I for hero status: ");
+                        System.out.printf(pr.GREEN + "%s" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, " + pr.BLUE + "B to recall" + pr.RESET + ", Q to quit, I for hero status: ", currentHeroTeam.getTeamMembers().get(heroIndex).getName());
                     }
                     moveLine = in.nextLine();
                     canMove = currentWorldMap.heroCanMove(moveLine, heroIndex);
                 }
 
                 // Move logic
-                String moveTo = currentWorldMap.heroMove(moveLine, heroIndex);
-                boolean encounterBattle = false;
-                if (moveTo.equals("Monster")) {
-                    encounterBattle = true;
-                } else if (moveTo.equals("Empty")) {
-                    Random rand = new Random();
-                    if (rand.nextInt(100) < encounterBattleChance*100) {
-                        encounterBattle = true;
-                    }
-                }
+                String moveToCellStatus = currentWorldMap.heroMove(moveLine, currentHeroTeam, heroIndex);
+                currentWorldMap.printBoard();
+                boolean encounterBattle = moveToCellStatus.equals("Monster");
                 if (encounterBattle) {
                     //battlePrompt();
                 }
+
+                // Only consume round when hero make a move
+                heroIndex++;
             }
             // Utility
             else if (GAMEINPUTMAPPING.get("utility").contains(moveLine)) {
+                // Recall
+                if (moveLine.equals("b") || moveLine.equals("B")) {
+                    currentWorldMap.heroRecall(heroIndex);
+                    currentWorldMap.printBoard();
+                    heroIndex++;
+                }
+
+                // Teleport
+                if (moveLine.equals("t") || moveLine.equals("T")) {
+
+                }
+
                 // Quit game
                 if (moveLine.equals("q") || moveLine.equals("Q")) {
                     exit(0);
@@ -127,15 +141,16 @@ public class GameLV extends BattleTurnBasedGame {
 
                 // Market
                 else if (moveLine.equals("m") || moveLine.equals("M")) {
-                    String marketKey = Integer.toString(currentWorldMap.get_boardCellHeight()*currentWorldMap.getHeroPosition()[0]+1) + " " +
-                            Integer.toString(currentWorldMap.get_boardCellWidth()*currentWorldMap.getHeroPosition()[1]+2);
-//                currentWorldMap.getMarkets().get(marketKey).marketPrompt(currentHeroTeam);
+                    String marketKey = Integer.toString(currentWorldMap.get_boardCellHeight()*currentWorldMap.getHeroPositions()[heroIndex][0]+1) + " " +
+                                       Integer.toString(currentWorldMap.get_boardCellWidth()*currentWorldMap.getHeroPositions()[heroIndex][1]+2);
+                    Market market = (Market) currentWorldMap.getMarkets().get(marketKey);
+                    market.marketPrompt(currentHeroTeam);
                 }
             }
-            //TODO: heroIndex and i are fixed
-            heroIndex++;
             if (heroIndex > 2) break;
         }
+
+        // Monster move
         for (int i = 0; i < 3; i++) {
             currentWorldMap.monsterMove(i);
         }

@@ -6,21 +6,14 @@ import java.util.*;
 
 public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunction {
     private T[][] board;
-    private int _boardCellWidth;
-    private int _boardCellHeight;
-    private double obstaclePercentage;
-    private double marketPercentage;
-    private double monsterPercentage;
-
-    private double bushPercentage;
-
-    private double cavePercentage;
-
-    private double koulouPercentage;
-    private int[] heroPosition;
-    private HashMap<String, Market> markets;
-    private int laneWidth;
-    private int inaccessibleWidth;
+    private final int _boardCellWidth;
+    private final int _boardCellHeight;
+    private final double bushPercentage;
+    private final double cavePercentage;
+    private final double koulouPercentage;
+    private final HashMap<String, Market> markets;
+    private final int laneWidth;
+    private final int inaccessibleWidth;
     private int[][] heroPositions;
     private int[][] monsterPositions;
     Printer pr = new Printer();
@@ -39,10 +32,6 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         this.bushPercentage = 0.05;
         this.cavePercentage = 0.05;
         this.koulouPercentage= 0.05;
-//        this.obstaclePercentage = 0.2;
-//        this.marketPercentage = 0.3;
-//        this.monsterPercentage = 0.2;
-        this.heroPosition = new int[]{0, 0};
         this.heroPositions = new int[][]{{h, 0}, {h, 3}, {h, 6}};
         this.monsterPositions = new int[][]{{0, 0}, {0, 3}, {0, 6}};
         this.markets = new HashMap<String, Market>();
@@ -58,10 +47,6 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
     public HashMap<String, Market> getMarkets() {
         return markets;
     }
-    public int[] getHeroPosition() {
-        return heroPosition;
-    }
-
     public int[][] getHeroPositions() {
         return heroPositions;
     }
@@ -104,16 +89,12 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         // Initialize hero nexus positions and setup markets
         for (int i = 0; i < getWidth(); i+=laneWidth+1) {
             for (int j = 0; j < laneWidth; j++) {
-                int x = bottomRow;
-                int y = _boardCellWidth*i+_boardCellWidth*j+2;
                 board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+1] = (T) new CellLVHeroNexus(" ");
-                markets.put(x + " " + y, new Market(new int[]{x, y}));
                 board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+2] = (T) new CellLVHeroNexus("N");
-                markets.put(x + " " + y, new Market(new int[]{x, y}));
                 board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+2].setEmpty(false);
                 board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+2].setHeroNexus(true);
+                markets.put(bottomRow + " " + _boardCellWidth*i+_boardCellWidth*j+2, new Market(new int[]{bottomRow, _boardCellWidth*i+_boardCellWidth*j+2}));
                 board[bottomRow][_boardCellWidth*i+_boardCellWidth*j+3] = (T) new CellLVHeroNexus(" ");
-                markets.put(x + " " + y, new Market(new int[]{x, y}));
                 heroNexusColPos[index] = _boardCellWidth*i+_boardCellWidth*j+2;
                 index++;
             }
@@ -131,23 +112,23 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
                 index++;
             }
         }
+
         // Initialize inaccessible spaces
         for (int i = laneWidth; i < getWidth(); i+=laneWidth+1) {
             for (int j = 0; j < getHeight(); j++) {
                 board[_boardCellHeight*j+1][_boardCellWidth*i+1] = (T) new CellLVInaccessible(" ");
-                board[_boardCellHeight*j+1][_boardCellWidth*i+1].setEmpty(false);
                 board[_boardCellHeight*j+1][_boardCellWidth*i+2] = (T) new CellLVInaccessible("X");
                 board[_boardCellHeight*j+1][_boardCellWidth*i+2].setEmpty(false);
-                board[_boardCellHeight*j+1][_boardCellWidth*i+2].setObstacle(true);
                 board[_boardCellHeight*j+1][_boardCellWidth*i+3] = (T) new CellLVInaccessible(" ");
-                board[_boardCellHeight*j+1][_boardCellWidth*i+3].setEmpty(false);
             }
         }
+
         // Initialize hero positions (random within laneWidth range), in nexus
         Random rand = new Random();
         for (int i = 0; i < numCreature; i++) {
             int rand_pos = rand.nextInt(laneWidth);
-            board[bottomRow][heroNexusColPos[rand_pos + i * 2]].setContent(pr.BLUE_BG + "H" + pr.RESET);
+            board[bottomRow][heroNexusColPos[rand_pos + i * 2]].setContent(pr.BLUE_BG + pr.PURPLE + "H" + pr.RESET);
+            board[bottomRow][heroNexusColPos[rand_pos + i * 2]].setHero(true);
             heroPositions[i] = new int[]{getHeight() - 1, rand_pos + i * 3};
         }
 
@@ -155,6 +136,7 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         for (int i = 0; i < numCreature; i++) {
             int rand_pos = rand.nextInt(laneWidth);
             board[topRow][monsterNexusColPos[rand_pos + i * 2]].setContent(pr.RED_BG + "M" + pr.RESET);
+            board[topRow][monsterNexusColPos[rand_pos + i * 2]].setMonster(true);
             monsterPositions[i] = new int[]{0, rand_pos + i * 3};
         }
 
@@ -175,7 +157,6 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
                 }
             }
         }
-
         for (int i = 0; i < numBush; i++) {
             int[] availablePosition = availablePositions.remove(rand.nextInt(availablePositions.size()));
             x = availablePosition[0];
@@ -184,7 +165,6 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
             board[x][y].setEmpty(false);
             board[x][y].setBush(true);
         }
-
         for (int i = 0; i < numCave; i++) {
             int[] availablePosition = availablePositions.remove(rand.nextInt(availablePositions.size()));
             x = availablePosition[0];
@@ -193,7 +173,6 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
             board[x][y].setEmpty(false);
             board[x][y].setCave(true);
         }
-
         for (int i = 0; i < numKoulou; i++) {
             int[] availablePosition = availablePositions.remove(rand.nextInt(availablePositions.size()));
             x = availablePosition[0];
@@ -202,36 +181,6 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
             board[x][y].setEmpty(false);
             board[x][y].setKoulou(true);
         }
-
-//        int numObstacles = (int) Math.floor(boardSize * obstaclePercentage);
-//        int numMarkets = (int) Math.floor(boardSize * marketPercentage);
-//        int numMonsters = (int) Math.floor(boardSize * monsterPercentage);
-//
-//        for (int i = 0; i < numObstacles; i++) {
-//            int[] availablePosition = availablePositions.remove(rand.nextInt(availablePositions.size()));
-//            x = availablePosition[0];
-//            y = availablePosition[1];
-////            board[x][y].setContent(pr.WHITE_BG + "X" + pr.RESET);
-//            //board[x][y].setEmpty(false);
-//            //board[x][y].setObstacle(true);
-//        }
-//        for (int i = 0; i < numMarkets; i++) {
-//            int[] availablePosition = availablePositions.remove(rand.nextInt(availablePositions.size()));
-//            x = availablePosition[0];
-//            y = availablePosition[1];
-////            board[x][y].setContent(pr.YELLOW + "$" + pr.RESET);
-//            //markets.put(x + " " + y, new Market(new int[]{x, y}));
-//            //board[x][y].setEmpty(false);
-//            //board[x][y].setMarket(true);
-//        }
-//        for (int i = 0; i < numMonsters; i++) {
-//            //int[] availablePosition = availablePositions.remove(rand.nextInt(availablePositions.size()));
-//           //x = availablePosition[0];
-//            //y = availablePosition[1];
-////            board[x][y].setContent(pr.RED_BG + "?" + pr.RESET);
-//            //board[x][y].setEmpty(false);
-//            //board[x][y].setMonster(true);
-//        }
     }
 
     @Override
@@ -268,24 +217,63 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
     }
 
     public boolean heroCanMove(String moveDirection, int heroIndex) {
+        int old_x = _boardCellHeight * heroPositions[heroIndex][0] + 1;
+        int old_y = _boardCellWidth * heroPositions[heroIndex][1] + 2;
         int[] newPos = calculateNextPosition(moveDirection, heroIndex);
         int new_x = _boardCellHeight*newPos[0]+1;
         int new_y = _boardCellWidth*newPos[1]+2;
+        System.out.printf("old_x: %d, new_x: %d, old_y: %d, new_y: %d\n", old_x, new_x, old_y, new_y);
+        // Out of bound
         if (newPos[0] < 0 || newPos[0] >= height || newPos[1] < 0 || newPos[1] >= width) {
             return false;
         }
+        // Pass the monster
+        if (board[old_x][old_y].isMonster() ||
+            (old_y-_boardCellWidth >= 0 && board[old_x][old_y-_boardCellWidth].isMonster()) ||
+            (old_y+_boardCellWidth <= _boardCellWidth*width+1 && board[old_x][old_y+_boardCellWidth].isMonster())) {
+            if (new_x < old_x) {
+                return false;
+            }
+        }
+        // Into another hero's space
+        if (board[new_x][new_y].getContent().equals("H")) {
+            return false;
+        }
         CellLV newCell = board[new_x][new_y];
-        return true;
+        return !(newCell instanceof CellLVInaccessible);
     }
 
-    public String heroMove(String moveDirection, int heroIndex) {
+
+    /**
+     * Assuming hero can move
+     */
+    public String heroMove(String moveDirection, TeamHero currentHeroTeam, int heroIndex) {
         int[] newPos = calculateNextPosition(moveDirection, heroIndex);
         int old_x = _boardCellHeight * heroPositions[heroIndex][0] + 1;
         int old_y = _boardCellWidth * heroPositions[heroIndex][1] + 2;
         int new_x = _boardCellHeight * newPos[0] + 1;
         int new_y = _boardCellWidth * newPos[1] + 2;
 
+        // Restore old position and remove buff
         restoreOldPos(old_x, old_y);
+        board[old_x][old_y].setHero(false);
+        if (board[old_x][old_y].isBush()) {
+            ((CellLVBush) board[old_x][old_y]).removeBuff(currentHeroTeam.getTeamMembers().get(heroIndex));
+        } else if (board[old_x][old_y].isCave()) {
+            ((CellLVCave) board[old_x][old_y]).removeBuff(currentHeroTeam.getTeamMembers().get(heroIndex));
+        } else if (board[old_x][old_y].isKoulou()) {
+            ((CellLVKoulou) board[old_x][old_y]).removeBuff(currentHeroTeam.getTeamMembers().get(heroIndex));
+        }
+
+        // Add new buff if needed
+        if (board[new_x][new_y].isBush()) {
+            ((CellLVBush) board[new_x][new_y]).buff(currentHeroTeam.getTeamMembers().get(heroIndex));
+        } else if (board[new_x][new_y].isCave()) {
+            ((CellLVCave) board[new_x][new_y]).buff(currentHeroTeam.getTeamMembers().get(heroIndex));
+        } else if (board[new_x][new_y].isKoulou()) {
+            ((CellLVKoulou) board[new_x][new_y]).buff(currentHeroTeam.getTeamMembers().get(heroIndex));
+        }
+
         return processNewPos(new_x, new_y, heroIndex, newPos);
     }
 
@@ -295,15 +283,23 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         int old_y = _boardCellWidth * monsterPositions[monsterIndex][1] + 2;
         int new_x = _boardCellHeight * newPos[0] + 1;
         int new_y = _boardCellWidth * newPos[1] + 2;
-
+        // Pass the hero, can't move
+        if (board[old_x][old_y].isHero() ||
+            (old_y-_boardCellWidth >= 0 && board[old_x][old_y-_boardCellWidth].isHero()) ||
+            (old_y+_boardCellWidth <= _boardCellWidth*width+1 && board[old_x][old_y+_boardCellWidth].isHero())) {
+            if (new_x > old_x) {
+                return;
+            }
+        }
         restoreOldPos(old_x, old_y);
-
+        board[old_x][old_y].setMonster(false);
         board[new_x][new_y].setContent(pr.RED + "M" + pr.RESET);
         monsterPositions[monsterIndex][0] = newPos[0];
         monsterPositions[monsterIndex][1] = newPos[1];
+        board[new_x][new_y].setMonster(true);
     }
 
-    // Restore old positions
+    // Restore old positions for heroes and monsters passing
     public void restoreOldPos(int old_x, int old_y) {
         if (board[old_x][old_y].isHeroNexus()) {
             board[old_x][old_y].setContent(pr.BLUE_BG + "N" + pr.RESET);
@@ -320,36 +316,49 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         }
     }
 
-    // Proceed to new position
+    // Proceed to new position for heroes only
     public String processNewPos(int new_x, int new_y, int heroIndex, int[] newPos) {
-            board[new_x][new_y].setContent(pr.GREEN + "H" + pr.RESET);
-            heroPositions[heroIndex][0] = newPos[0];
-            heroPositions[heroIndex][1] = newPos[1];
-            if (board[new_x][new_y].isMonster()) {
-                return "Monster";
-            } else if (board[new_x][new_y].isEmpty()) {
-                return "Empty";
-            }
-            return "Market";
+        heroPositions[heroIndex][0] = newPos[0];
+        heroPositions[heroIndex][1] = newPos[1];
+        board[new_x][new_y].setHero(true);
+        if (heroAtHeroNexus(heroIndex)) {
+            board[new_x][new_y].setContent(pr.BLUE_BG + pr.PURPLE + "H" + pr.RESET);
+        } else {
+            board[new_x][new_y].setContent(pr.PURPLE + "H" + pr.RESET);
+        }
+        String cellStatus = "";
+        if (board[new_x][new_y].isMonster()) {
+            cellStatus += "Monster";
+        }
+        return cellStatus;
     }
 
-    public boolean heroAtHeroNexus() {
-        return board[_boardCellHeight*heroPosition[0]+1][_boardCellWidth*heroPosition[1]+2] instanceof CellLVHeroNexus;
+    public void heroRecall(int heroIndex) {
+        int old_x = _boardCellHeight * heroPositions[heroIndex][0] + 1;
+        int old_y = _boardCellWidth * heroPositions[heroIndex][1] + 2;
+        int new_x = _boardCellHeight * height - 1;
+        restoreOldPos(old_x, old_y);
+        board[old_x][old_y].setHero(false);
+        processNewPos(new_x, old_y, heroIndex, new int[]{height-1, heroPositions[heroIndex][1]});
     }
 
-    public boolean heroAtBush() {
-        return board[_boardCellHeight*heroPosition[0]+1][_boardCellWidth*heroPosition[1]+2] instanceof CellLVBush;
+    public boolean heroAtHeroNexus(int heroIndex) {
+        return board[_boardCellHeight*heroPositions[heroIndex][0]+1][_boardCellWidth*heroPositions[heroIndex][1]+2] instanceof CellLVHeroNexus;
     }
 
-    public boolean heroAtCave() {
-        return board[_boardCellHeight*heroPosition[0]+1][_boardCellWidth*heroPosition[1]+2] instanceof CellLVCave;
+    public boolean heroAtBush(int heroIndex) {
+        return board[_boardCellHeight*heroPositions[heroIndex][0]+1][_boardCellWidth*heroPositions[heroIndex][1]+2] instanceof CellLVBush;
     }
 
-    public boolean heroAtKoulou() {
-        return board[_boardCellHeight*heroPosition[0]+1][_boardCellWidth*heroPosition[1]+2] instanceof CellLVKoulou;
+    public boolean heroAtCave(int heroIndex) {
+        return board[_boardCellHeight*heroPositions[heroIndex][0]+1][_boardCellWidth*heroPositions[heroIndex][1]+2] instanceof CellLVCave;
     }
 
-    public boolean heroAtMonsterNexus() {
-        return board[_boardCellHeight*heroPosition[0]+1][_boardCellWidth*heroPosition[1]+2] instanceof CellLVMonsterNexus;
+    public boolean heroAtKoulou(int heroIndex) {
+        return board[_boardCellHeight*heroPositions[heroIndex][0]+1][_boardCellWidth*heroPositions[heroIndex][1]+2] instanceof CellLVKoulou;
+    }
+
+    public boolean heroAtMonsterNexus(int heroIndex) {
+        return board[_boardCellHeight*heroPositions[heroIndex][0]+1][_boardCellWidth*heroPositions[heroIndex][1]+2] instanceof CellLVMonsterNexus;
     }
 }
