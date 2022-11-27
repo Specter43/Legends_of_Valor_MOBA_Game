@@ -9,7 +9,7 @@ import static java.lang.System.exit;
 public class GameLV extends BattleTurnBasedGame {
     private static final HashMap<String, ArrayList<String>> GAMEINPUTMAPPING = new HashMap<String, ArrayList<String>>() {{
         put("move", new ArrayList<String>(){{add("w"); add("W"); add("a"); add("A"); add("s"); add("S"); add("d"); add("D");}});
-        put("utility", new ArrayList<String>(){{add("b"); add("B"); add("q"); add("Q"); add("i"); add("I"); add("m"); add("M");}});
+        put("utility", new ArrayList<String>(){{add("b"); add("B"); add("t"); add("T"); add("q"); add("Q"); add("i"); add("I"); add("m"); add("M");}});
     }};
     Printer pr = new Printer();
 
@@ -75,7 +75,7 @@ public class GameLV extends BattleTurnBasedGame {
             if (currentWorldMap.heroAtHeroNexus(heroIndex)) {
                 System.out.printf(pr.GREEN + "%s" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, Q to quit, I for hero status, " + pr.YELLOW + "M for market: " + pr.RESET, currentHeroTeam.getTeamMembers().get(heroIndex).getName());
             } else {
-                System.out.printf(pr.GREEN + "%s" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, " + pr.BLUE + "B to recall" + pr.RESET + ", Q to quit, I for hero status: ", currentHeroTeam.getTeamMembers().get(heroIndex).getName());
+                System.out.printf(pr.GREEN + "%s" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, " + pr.BLUE + "B to recall" + pr.RESET + ", " + pr.CYAN + "T to teleport" + pr.RESET + ", Q to quit, I for hero status: ", currentHeroTeam.getTeamMembers().get(heroIndex).getName());
             }
             String moveLine = in.nextLine();
             while (!GAMEINPUTMAPPING.get("move").contains(moveLine) &&
@@ -83,7 +83,7 @@ public class GameLV extends BattleTurnBasedGame {
                 if (currentWorldMap.heroAtHeroNexus(heroIndex)) {
                     System.out.print("That did not look like a valid choice, please enter W/A/S/D/Q/I/M: ");
                 } else {
-                    System.out.print("That did not look like a valid choice, please enter W/A/S/D/B/Q/I: ");
+                    System.out.print("That did not look like a valid choice, please enter W/A/S/D/B/T/Q/I: ");
                 }
                 moveLine = in.nextLine();
             }
@@ -98,7 +98,7 @@ public class GameLV extends BattleTurnBasedGame {
                     if (currentWorldMap.heroAtHeroNexus(heroIndex)) {
                         System.out.printf(pr.GREEN + "%s" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, Q to quit, I for hero status, " + pr.YELLOW + "M for market: " + pr.RESET, currentHeroTeam.getTeamMembers().get(heroIndex).getName());
                     } else {
-                        System.out.printf(pr.GREEN + "%s" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, " + pr.BLUE + "B to recall" + pr.RESET + ", Q to quit, I for hero status: ", currentHeroTeam.getTeamMembers().get(heroIndex).getName());
+                        System.out.printf(pr.GREEN + "%s" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, " + pr.BLUE + "B to recall" + pr.RESET + ", " + pr.CYAN + "T to teleport" + pr.RESET + ", Q to quit, I for hero status: ", currentHeroTeam.getTeamMembers().get(heroIndex).getName());
                     }
                     moveLine = in.nextLine();
                     canMove = currentWorldMap.heroCanMove(moveLine, heroIndex);
@@ -126,7 +126,15 @@ public class GameLV extends BattleTurnBasedGame {
 
                 // Teleport
                 if (moveLine.equals("t") || moveLine.equals("T")) {
-
+                    System.out.print("Where you want to teleport? 0-2: ");
+                    String targetLine = in.nextLine();
+                    while (!targetLine.equals("0") && !targetLine.equals("1") && !targetLine.equals("2")) {
+                        System.out.print("That did not look like a valid choice, please enter 0-2: ");
+                        targetLine = in.nextLine();
+                    }
+                    currentWorldMap.heroTeleport(heroIndex, Integer.parseInt(targetLine));
+                    currentWorldMap.printBoard();
+                    heroIndex++;
                 }
 
                 // Quit game

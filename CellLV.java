@@ -10,6 +10,8 @@ public abstract class CellLV extends Cell {
     private boolean isBush;
     private boolean isKoulou;
 
+    private boolean isObstacle;
+
     public CellLV(Object content) {
         super(content);
     }
@@ -67,5 +69,13 @@ public abstract class CellLV extends Cell {
 
     public void setMonster(boolean monster) {
         isMonster = monster;
+    }
+
+    public boolean isObstacle() {
+        return isObstacle;
+    }
+
+    public void setObstacle(boolean obstacle) {
+        isObstacle = obstacle;
     }
 }
