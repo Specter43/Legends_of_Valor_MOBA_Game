@@ -14,7 +14,10 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
     private final HashMap<String, Market> markets;
     private final int laneWidth;
     private final int inaccessibleWidth;
+
+    private int numCreature;
     private int[][] heroPositions;
+    private int[][] heroOriginalPos;
     private int[][] monsterPositions;
     Printer pr = new Printer();
 
@@ -28,11 +31,13 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         this._boardCellHeight = 2;
         this._boardCellWidth = 4;
         this.laneWidth = 2;
+        this.numCreature = 0;
         this.inaccessibleWidth = 1;
         this.bushPercentage = 0.05;
         this.cavePercentage = 0.05;
         this.koulouPercentage= 0.05;
         this.heroPositions = new int[][]{{h, 0}, {h, 3}, {h, 6}};
+        this.heroOriginalPos = new int[][]{{h, 0}, {h, 3}, {h, 6}};
         this.monsterPositions = new int[][]{{0, 0}, {0, 3}, {0, 6}};
         this.markets = new HashMap<String, Market>();
         this.board = (T[][]) new CellLV[_boardCellHeight*h+1][_boardCellWidth*w+1];
@@ -50,6 +55,7 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
     public int[][] getHeroPositions() {
         return heroPositions;
     }
+    public int getNumCreature() {return numCreature; }
 
     /**
      * Initialize an empty world map.
@@ -78,7 +84,6 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
     public void initializeWorld() {
         int topRow = 1;
         int bottomRow = _boardCellHeight*getHeight()-1;
-        int numCreature = 0;
         if (getWidth() % 3 == 0)
             numCreature = getWidth() / 3;
         else
@@ -131,6 +136,7 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
             board[bottomRow][heroNexusColPos[rand_pos + i * 2]].setContent(pr.BLUE_BG + pr.PURPLE + "H" + pr.RESET);
             board[bottomRow][heroNexusColPos[rand_pos + i * 2]].setHero(true);
             heroPositions[i] = new int[]{getHeight() - 1, rand_pos + i * 3};
+            heroOriginalPos[i] = new int[]{getHeight() - 1, rand_pos + i * 3};
         }
 
         // Initialize monster positions (random within laneWidth range), in nexus
@@ -339,17 +345,13 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         int old_x = _boardCellHeight * heroPositions[heroIndex][0] + 1;
         int old_y = _boardCellWidth * heroPositions[heroIndex][1] + 2;
         int new_x = _boardCellHeight * height - 1;
+        int new_y = _boardCellWidth * heroOriginalPos[heroIndex][1] + 2;
         restoreOldPos(old_x, old_y);
         board[old_x][old_y].setHero(false);
-        processNewPos(new_x, old_y, heroIndex, new int[]{height-1, heroPositions[heroIndex][1]});
+        processNewPos(new_x, new_y, heroIndex, new int[]{heroOriginalPos[heroIndex][0], heroOriginalPos[heroIndex][1]});
     }
 
     public void heroTeleport(int heroIndex, int targetHeroIndex) {
-        if (heroIndex == targetHeroIndex) {
-            System.out.println(pr.CYAN + "You cannot teleport to the same lane!" + pr.RESET);
-            return;
-        }
-
         int old_x = _boardCellHeight * heroPositions[heroIndex][0] + 1;
         int old_y = _boardCellWidth * heroPositions[heroIndex][1] + 2;
         int new_x = _boardCellHeight * heroPositions[targetHeroIndex][0] + 1;
@@ -365,58 +367,54 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
     }
 
     public void checkLeftCell(int new_x, int new_y, int old_x, int old_y, int heroIndex, int targetHeroIndex) {
-        if (board[new_x][new_y - 4].isMonster() || board[new_x][new_y - 4].isBush() || board[new_x][new_y - 4].isCave()
+        if (board[new_x][new_y - 4].isHero()) {
+            restoreOldPos(old_x, old_y);
+            board[old_x][old_y].setHero(false);
+            processNewPos(new_x + 2, new_y, heroIndex, new int[]{heroPositions[targetHeroIndex][0] + 1, heroPositions[targetHeroIndex][1]});
+        } else if (board[new_x][new_y - 4].isMonster() || board[new_x][new_y - 4].isBush() || board[new_x][new_y - 4].isCave()
                 || board[new_x][new_y - 4].isKoulou() || board[new_x][new_y - 4].isEmpty()) {
             restoreOldPos(old_x, old_y);
             board[old_x][old_y].setHero(false);
             processNewPos(new_x, new_y - 4, heroIndex, new int[]{heroPositions[targetHeroIndex][0], heroPositions[targetHeroIndex][1] - 1});
-        } else if (board[new_x][new_y - 4].isHero()) {
-            restoreOldPos(old_x, old_y);
-            board[old_x][old_y].setHero(false);
-            //TODO: not working
-            processNewPos(new_x + 2, new_y, heroIndex, new int[]{heroPositions[targetHeroIndex][0] + 1, heroPositions[targetHeroIndex][1]});
         } else {
             System.out.println(pr.RED + "YOU SHALL NOT PASS!"  + pr.RESET);
         }
     }
 
     public void checkRightCell(int new_x, int new_y, int old_x, int old_y, int heroIndex, int targetHeroIndex) {
-        if (board[new_x][new_y + 4].isMonster() || board[new_x][new_y + 4].isBush() || board[new_x][new_y + 4].isCave()
-                || board[new_x][new_y + 4].isKoulou() || board[new_x][new_y + 4].isEmpty()) {
+        if (board[new_x][new_y + 4].isHero()) {
             restoreOldPos(old_x, old_y);
             board[old_x][old_y].setHero(false);
-            processNewPos(new_x, new_y + 4, heroIndex, new int[]{heroPositions[targetHeroIndex][0], heroPositions[targetHeroIndex][1] + 1});
-        } else if (board[new_x][new_y + 4].isHero()) {
-            restoreOldPos(old_x, old_y);
-            board[old_x][old_y].setHero(false);
-            //TODO: not working
-            processNewPos(new_x + 2, new_y, heroIndex, new int[]{heroPositions[targetHeroIndex][0] + 1, heroPositions[targetHeroIndex][1]});
-        } else {
-            System.out.println(pr.RED + "YOU SHALL NOT PASS!"  + pr.RESET);
-        }
-    }
-
-    public void checkLeftRightCell(int new_x, int new_y, int old_x, int old_y, int heroIndex, int targetHeroIndex) {
-        if (board[new_x][new_y - 4].isMonster() || board[new_x][new_y - 4].isBush() || board[new_x][new_y - 4].isCave()
-                || board[new_x][new_y - 4].isKoulou() || board[new_x][new_y - 4].isEmpty()) {
-            restoreOldPos(old_x, old_y);
-            board[old_x][old_y].setHero(false);
-            processNewPos(new_x, new_y - 4, heroIndex, new int[]{heroPositions[targetHeroIndex][0], heroPositions[targetHeroIndex][1] - 1});
-        } else if (board[new_x][new_y - 4].isHero()) {
-            restoreOldPos(old_x, old_y);
-            board[old_x][old_y].setHero(false);
-            //TODO: not working
             processNewPos(new_x + 2, new_y, heroIndex, new int[]{heroPositions[targetHeroIndex][0] + 1, heroPositions[targetHeroIndex][1]});
         } else if (board[new_x][new_y + 4].isMonster() || board[new_x][new_y + 4].isBush() || board[new_x][new_y + 4].isCave()
                 || board[new_x][new_y + 4].isKoulou() || board[new_x][new_y + 4].isEmpty()) {
             restoreOldPos(old_x, old_y);
             board[old_x][old_y].setHero(false);
             processNewPos(new_x, new_y + 4, heroIndex, new int[]{heroPositions[targetHeroIndex][0], heroPositions[targetHeroIndex][1] + 1});
+        } else {
+            System.out.println(pr.RED + "YOU SHALL NOT PASS!"  + pr.RESET);
+        }
+    }
+
+    public void checkLeftRightCell(int new_x, int new_y, int old_x, int old_y, int heroIndex, int targetHeroIndex) {
+        if (board[new_x][new_y - 4].isHero()) {
+            restoreOldPos(old_x, old_y);
+            board[old_x][old_y].setHero(false);
+            processNewPos(new_x + 2, new_y, heroIndex, new int[]{heroPositions[targetHeroIndex][0] + 1, heroPositions[targetHeroIndex][1]});
         } else if (board[new_x][new_y + 4].isHero()) {
             restoreOldPos(old_x, old_y);
             board[old_x][old_y].setHero(false);
-            //TODO: not working
             processNewPos(new_x + 2, new_y, heroIndex, new int[]{heroPositions[targetHeroIndex][0] + 1, heroPositions[targetHeroIndex][1]});
+        } else if (board[new_x][new_y - 4].isMonster() || board[new_x][new_y - 4].isBush() || board[new_x][new_y - 4].isCave()
+                || board[new_x][new_y - 4].isKoulou() || board[new_x][new_y - 4].isEmpty()) {
+            restoreOldPos(old_x, old_y);
+            board[old_x][old_y].setHero(false);
+            processNewPos(new_x, new_y - 4, heroIndex, new int[]{heroPositions[targetHeroIndex][0], heroPositions[targetHeroIndex][1] - 1});
+        } else if (board[new_x][new_y + 4].isMonster() || board[new_x][new_y + 4].isBush() || board[new_x][new_y + 4].isCave()
+                || board[new_x][new_y + 4].isKoulou() || board[new_x][new_y + 4].isEmpty()) {
+            restoreOldPos(old_x, old_y);
+            board[old_x][old_y].setHero(false);
+            processNewPos(new_x, new_y + 4, heroIndex, new int[]{heroPositions[targetHeroIndex][0], heroPositions[targetHeroIndex][1] + 1});
         } else {
             System.out.println(pr.RED + "YOU SHALL NOT PASS!"  + pr.RESET);
         }

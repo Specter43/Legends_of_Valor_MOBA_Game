@@ -13,15 +13,18 @@ public class GameLV extends BattleTurnBasedGame {
     }};
     Printer pr = new Printer();
 
+    private ArrayList<Integer> validLane = new ArrayList<>();
     private BoardWorldMap currentWorldMap;
     private TeamHero currentHeroTeam;
     private QueueBattle currentQueueBattle;
     private double encounterBattleChance;
+    private int numCreature;
 
     public GameLV(TeamHero currentHeroTeam) {
         this.currentWorldMap = new BoardWorldMap(8, 8);
         this.currentHeroTeam = currentHeroTeam;
         this.encounterBattleChance = 0.2;
+        this.numCreature = 0;
     }
 
     @Override
@@ -29,6 +32,9 @@ public class GameLV extends BattleTurnBasedGame {
         Scanner in = new Scanner(System.in);
         this.currentWorldMap.initializeBoard();
         this.currentWorldMap.initializeWorld();
+        this.numCreature = currentWorldMap.getNumCreature();
+        for (int i = 0; i < numCreature; i++)
+            this.validLane.add(i);
         this.currentWorldMap.printBoard();
         System.out.println(pr.BLUE + "Welcome to this new world full of opportunity, danger, and of course, FUN! ENJOY!" + pr.RESET);
         System.out.println(pr.PURPLE + "H" + pr.RESET + " : This represents your teams and they will be starting at their Nexuses.");
@@ -120,19 +126,34 @@ public class GameLV extends BattleTurnBasedGame {
                 // Recall
                 if (moveLine.equals("b") || moveLine.equals("B")) {
                     currentWorldMap.heroRecall(heroIndex);
+                    validLane.add(heroIndex);
                     currentWorldMap.printBoard();
                     heroIndex++;
                 }
 
                 // Teleport
                 if (moveLine.equals("t") || moveLine.equals("T")) {
-                    System.out.print("Where you want to teleport? 0-2: ");
+
+                    System.out.print("Where you want to teleport? 1-" + numCreature + ": ");
                     String targetLine = in.nextLine();
-                    while (!targetLine.equals("0") && !targetLine.equals("1") && !targetLine.equals("2")) {
-                        System.out.print("That did not look like a valid choice, please enter 0-2: ");
+                    int targetLine_int = Integer.parseInt(targetLine);
+                    while (targetLine_int < 1 || targetLine_int > numCreature) {
+                        System.out.print("That did not look like a valid choice, please enter 1-" + numCreature + ": ");
                         targetLine = in.nextLine();
+                        targetLine_int = Integer.parseInt(targetLine);
                     }
-                    currentWorldMap.heroTeleport(heroIndex, Integer.parseInt(targetLine));
+                    while(!validLane.contains(targetLine_int - 1)) {
+                        System.out.print("Cannot teleport to that lane, try another one 1-" + numCreature + ": ");
+                        targetLine = in.nextLine();
+                        targetLine_int = Integer.parseInt(targetLine);
+                    }
+                    if (targetLine_int - 1 == heroIndex) {
+                        currentWorldMap.heroTeleport(heroIndex, targetLine_int - 1);
+                        System.out.println(pr.CYAN + "You have teleported to the same lane..." + pr.RESET);
+                    } else {
+                        currentWorldMap.heroTeleport(heroIndex, targetLine_int - 1);
+                        validLane.remove(Integer.valueOf(heroIndex));
+                    }
                     currentWorldMap.printBoard();
                     heroIndex++;
                 }
@@ -155,11 +176,11 @@ public class GameLV extends BattleTurnBasedGame {
                     market.marketPrompt(currentHeroTeam);
                 }
             }
-            if (heroIndex > 2) break;
+            if (heroIndex > numCreature - 1) break;
         }
 
         // Monster move
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < numCreature; i++) {
             currentWorldMap.monsterMove(i);
         }
         return null;
