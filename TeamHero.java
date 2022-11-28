@@ -36,7 +36,7 @@ public class TeamHero extends Team<Hero> {
         
         // Prompt for initializing team members
         Scanner in = new Scanner(System.in);
-        System.out.printf(pr.BLUE + "How many heroes will we be having today? Please enter %s~%s: " + pr.RESET, VALIDTEAMNUMS.get(0), VALIDTEAMNUMS.get(VALIDTEAMNUMS.size()-1));
+        System.out.printf("How many heroes will we be having today? " + pr.BLUE + "Please enter %s~%s: " + pr.RESET, VALIDTEAMNUMS.get(0), VALIDTEAMNUMS.get(VALIDTEAMNUMS.size()-1));
         String teamSizeLine = in.nextLine();
         while (!VALIDTEAMNUMS.contains(teamSizeLine)) {
             System.out.printf("That did not look like a valid number. Please enter %s~%s: ", VALIDTEAMNUMS.get(0), VALIDTEAMNUMS.get(VALIDTEAMNUMS.size()-1));

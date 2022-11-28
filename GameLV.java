@@ -8,7 +8,7 @@ import static java.lang.System.exit;
  */
 public class GameLV extends BattleTurnBasedGame {
     private static final HashMap<String, ArrayList<String>> GAMEINPUTMAPPING = new HashMap<String, ArrayList<String>>() {{
-        put("move", new ArrayList<String>(){{add("w"); add("W"); add("a"); add("A"); add("s"); add("S"); add("d"); add("D");}});
+        put("move", new ArrayList<String>(){{add("w"); add("W"); add("a"); add("A"); add("s"); add("S"); add("d"); add("D"); add("k"); add("K");}});
         put("utility", new ArrayList<String>(){{add("b"); add("B"); add("t"); add("T"); add("q"); add("Q"); add("i"); add("I"); add("m"); add("M");}});
     }};
     Printer pr = new Printer();
@@ -33,8 +33,6 @@ public class GameLV extends BattleTurnBasedGame {
         this.currentWorldMap.initializeBoard();
         this.currentWorldMap.initializeWorld();
         this.numCreature = currentWorldMap.getNumCreature();
-        for (int i = 0; i < numCreature; i++)
-            this.validLane.add(i);
         this.currentWorldMap.printBoard();
         System.out.println(pr.BLUE + "Welcome to this new world full of opportunity, danger, and of course, FUN! ENJOY!" + pr.RESET);
         System.out.println(pr.PURPLE + "H" + pr.RESET + " : This represents your teams and they will be starting at their Nexuses.");
@@ -65,6 +63,8 @@ public class GameLV extends BattleTurnBasedGame {
                 market.initializeMarket(allWeapons, allArmors, allPotions, allFireSpells, allIceSpells, allLightningSpells);
             }
             System.out.println("RULE: The game only ends when all of your team faint. Stay Alive!");
+            for (int i = 0; i < numCreature; i++)
+                this.validLane.add(i);
         }
         // Re-initialize map
         else {
@@ -79,15 +79,19 @@ public class GameLV extends BattleTurnBasedGame {
         int heroIndex = 0;
         while(!isGameOver()) {
             if (currentWorldMap.heroAtHeroNexus(heroIndex)) {
-                System.out.printf(pr.GREEN + "%s" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, Q to quit, I for hero status, " + pr.YELLOW + "M for market: " + pr.RESET, currentHeroTeam.getTeamMembers().get(heroIndex).getName());
+                System.out.printf(pr.GREEN + "%s (lane: %d)" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, Q to quit, I for hero status, " + pr.YELLOW + "M for market: " + pr.RESET, currentHeroTeam.getTeamMembers().get(heroIndex).getName(), heroIndex+1);
+            } else if (currentWorldMap.monsterInRange(heroIndex, currentHeroTeam.getTeamMembers().get(heroIndex).getWeapons().attackRange()) != null) {
+                System.out.printf(pr.GREEN + "%s (lane: %d)" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, " + pr.RED + "K to attack" + pr.RESET + ", " + pr.BLUE + "B to recall" + pr.RESET + ", " + pr.DARK_PURPLE + "T to teleport" + pr.RESET + ", Q to quit, I for hero status: ", currentHeroTeam.getTeamMembers().get(heroIndex).getName(), heroIndex+1);
             } else {
-                System.out.printf(pr.GREEN + "%s" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, " + pr.BLUE + "B to recall" + pr.RESET + ", " + pr.CYAN + "T to teleport" + pr.RESET + ", Q to quit, I for hero status: ", currentHeroTeam.getTeamMembers().get(heroIndex).getName());
+                System.out.printf(pr.GREEN + "%s (lane: %d)" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, " + pr.BLUE + "B to recall" + pr.RESET + ", " + pr.DARK_PURPLE + "T to teleport" + pr.RESET + ", Q to quit, I for hero status: ", currentHeroTeam.getTeamMembers().get(heroIndex).getName(), heroIndex+1);
             }
             String moveLine = in.nextLine();
             while (!GAMEINPUTMAPPING.get("move").contains(moveLine) &&
                     !GAMEINPUTMAPPING.get("utility").contains(moveLine)) {
                 if (currentWorldMap.heroAtHeroNexus(heroIndex)) {
                     System.out.print("That did not look like a valid choice, please enter W/A/S/D/Q/I/M: ");
+                } else if (currentWorldMap.monsterInRange(heroIndex, currentHeroTeam.getTeamMembers().get(heroIndex).getWeapons().attackRange()) != null) {
+                    System.out.print("That did not look like a valid choice, please enter W/A/S/D/K/B/T/Q/I: ");
                 } else {
                     System.out.print("That did not look like a valid choice, please enter W/A/S/D/B/T/Q/I: ");
                 }
@@ -102,22 +106,29 @@ public class GameLV extends BattleTurnBasedGame {
                 while (!canMove) {
                     System.out.println(pr.RED + "YOU SHALL NOT PASS!"  + pr.RESET);
                     if (currentWorldMap.heroAtHeroNexus(heroIndex)) {
-                        System.out.printf(pr.GREEN + "%s" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, Q to quit, I for hero status, " + pr.YELLOW + "M for market: " + pr.RESET, currentHeroTeam.getTeamMembers().get(heroIndex).getName());
+                        System.out.printf(pr.GREEN + "%s (lane: %d)" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, Q to quit, I for hero status, " + pr.YELLOW + "M for market: " + pr.RESET, currentHeroTeam.getTeamMembers().get(heroIndex).getName(), heroIndex+1);
+                    } else if (currentWorldMap.monsterInRange(heroIndex, currentHeroTeam.getTeamMembers().get(heroIndex).getWeapons().attackRange()) != null) {
+                        System.out.printf(pr.GREEN + "%s (lane: %d)" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, " + pr.RED + "K to attack" + pr.RESET + ", " + pr.BLUE + "B to recall" + pr.RESET + ", " + pr.DARK_PURPLE + "T to teleport" + pr.RESET + ", Q to quit, I for hero status: ", currentHeroTeam.getTeamMembers().get(heroIndex).getName(), heroIndex+1);
                     } else {
-                        System.out.printf(pr.GREEN + "%s" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, " + pr.BLUE + "B to recall" + pr.RESET + ", " + pr.CYAN + "T to teleport" + pr.RESET + ", Q to quit, I for hero status: ", currentHeroTeam.getTeamMembers().get(heroIndex).getName());
+                        System.out.printf(pr.GREEN + "%s (lane: %d)" + pr.RESET + ", it's your turn! Move around with W/A/S/D keys, " + pr.BLUE + "B to recall" + pr.RESET + ", " + pr.DARK_PURPLE + "T to teleport" + pr.RESET + ", Q to quit, I for hero status: ", currentHeroTeam.getTeamMembers().get(heroIndex).getName(), heroIndex+1);
                     }
                     moveLine = in.nextLine();
                     canMove = currentWorldMap.heroCanMove(moveLine, heroIndex);
                 }
 
-                // Move logic
-                String moveToCellStatus = currentWorldMap.heroMove(moveLine, currentHeroTeam, heroIndex);
-                currentWorldMap.printBoard();
-                boolean encounterBattle = moveToCellStatus.equals("Monster");
-                if (encounterBattle) {
+                if (moveLine.equals("K")) {
+                    // Attack logic
+                    System.out.println("ATTACK!");
                     //battlePrompt();
+                } else {
+                    // Move logic
+                    String moveToCellStatus = currentWorldMap.heroMove(moveLine, currentHeroTeam, heroIndex);
+                    currentWorldMap.printBoard();
+                    boolean encounterBattle = moveToCellStatus.equals("Monster");
+                    if (encounterBattle) {
+                        //battlePrompt();
+                    }
                 }
-
                 // Only consume round when hero make a move
                 heroIndex++;
             }
@@ -133,8 +144,7 @@ public class GameLV extends BattleTurnBasedGame {
 
                 // Teleport
                 if (moveLine.equals("t") || moveLine.equals("T")) {
-
-                    System.out.print("Where you want to teleport? 1-" + numCreature + ": ");
+                    System.out.print("Where do you want to teleport? 1-" + numCreature + ": ");
                     String targetLine = in.nextLine();
                     int targetLine_int = Integer.parseInt(targetLine);
                     while (targetLine_int < 1 || targetLine_int > numCreature) {

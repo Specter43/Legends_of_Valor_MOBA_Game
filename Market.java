@@ -23,7 +23,8 @@ public class Market {
                                                          Double.parseDouble(allWeapons.get("cost").get(i)),
                                                          Integer.parseInt(allWeapons.get("level").get(i)),
                                                          Double.parseDouble(allWeapons.get("damage").get(i)),
-                                                         Integer.parseInt(allWeapons.get("required hands").get(i)));
+                                                         Integer.parseInt(allWeapons.get("required hands").get(i)),
+                                                         Integer.parseInt(allWeapons.get("range").get(i)));
             inventory.addItem("Weapons", weapon);
         }
         int[] armorIndices = IntStream.range(0, (int) Math.ceil(itemPortion*allArmors.size())).map(i -> ThreadLocalRandom.current().nextInt(allArmors.get("Name").size())).toArray();

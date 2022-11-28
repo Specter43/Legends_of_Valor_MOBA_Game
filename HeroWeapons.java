@@ -22,4 +22,14 @@ public class HeroWeapons {
     public EquipmentWeapon takeOffWeapon(int weaponIndex) {
         return weapons.remove(weaponIndex);
     }
+
+    public int attackRange() {
+        int range = 1;
+        for (EquipmentWeapon weapon : weapons) {
+            if (weapon.getRange() > range) {
+                range = weapon.getRange();
+            }
+        }
+        return range;
+    }
 }

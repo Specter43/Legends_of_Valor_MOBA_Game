@@ -55,6 +55,7 @@ read class>
 2. <Bonus Done:
     (1): Colorful Output
     (2): Regenerate Map if not wanted
+    (3): Dynamic attack range
 >
 3. <Notes to grader>
     (1): Did not follow the game balance rules instructed by the handout,

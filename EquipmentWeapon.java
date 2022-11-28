@@ -5,22 +5,30 @@ import java.util.Scanner;
  */
 public class EquipmentWeapon extends Equipment {
     private double damageValue;
-    private int handValue;    
+    private int handValue;
+
+    private int range;
     Printer pr = new Printer();
 
-    public EquipmentWeapon(String name, double price, int level, double damageValue, int handValue) {
+    public EquipmentWeapon(String name, double price, int level, double damageValue, int handValue, int range) {
         super(name, price, level);
         this.damageValue = damageValue;
         this.handValue = handValue;
+        this.range = range;
+    }
+
+    public int getRange() {
+        return range;
     }
 
     @Override
     public void showItemInfo() {
         System.out.printf(pr.GREEN + "Name: %s\n" + pr.RESET, getName());
-        System.out.printf("      Level: %s  |  Damage: %s  |  Require: %s hands |  Price: %s\n",
+        System.out.printf("      Level: %s  |  Damage: %s  |  Require: %s hands   |  Range: %s  |  Price: %s\n",
                 getLevel(),
                 damageValue,
                 handValue,
+                range,
                 getPrice());
     }
 
