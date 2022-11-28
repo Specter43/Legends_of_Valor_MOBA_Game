@@ -370,8 +370,8 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
             restoreOldPos(old_x, old_y);
             board[old_x][old_y].setHero(false);
             processNewPos(new_x + _boardCellHeight, new_y, heroIndex, new int[]{heroPositions[targetHeroIndex][0] + 1, heroPositions[targetHeroIndex][1]});
-        } else if (board[new_x][new_y - _boardCellWidth].isMonster() || board[new_x][new_y - _boardCellWidth].isBush() || board[new_x][new_y - 4].isCave()
-                || board[new_x][new_y - _boardCellWidth].isKoulou() || board[new_x][new_y - _boardCellWidth].isEmpty()) {
+        } else if (board[new_x][new_y - _boardCellWidth].isMonster() || board[new_x][new_y - _boardCellWidth].isBush() || board[new_x][new_y - _boardCellWidth].isCave()
+                || board[new_x][new_y - _boardCellWidth].isKoulou() || board[new_x][new_y - _boardCellWidth].isEmpty() || board[new_x][new_y - _boardCellWidth].isHeroNexus()) {
             restoreOldPos(old_x, old_y);
             board[old_x][old_y].setHero(false);
             processNewPos(new_x, new_y - _boardCellWidth, heroIndex, new int[]{heroPositions[targetHeroIndex][0], heroPositions[targetHeroIndex][1] - 1});
@@ -386,7 +386,7 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
             board[old_x][old_y].setHero(false);
             processNewPos(new_x + _boardCellHeight, new_y, heroIndex, new int[]{heroPositions[targetHeroIndex][0] + 1, heroPositions[targetHeroIndex][1]});
         } else if (board[new_x][new_y + _boardCellWidth].isMonster() || board[new_x][new_y + _boardCellWidth].isBush() || board[new_x][new_y + _boardCellWidth].isCave()
-                || board[new_x][new_y + _boardCellWidth].isKoulou() || board[new_x][new_y + _boardCellWidth].isEmpty()) {
+                || board[new_x][new_y + _boardCellWidth].isKoulou() || board[new_x][new_y + _boardCellWidth].isEmpty() || board[new_x][new_y + _boardCellWidth].isHeroNexus()) {
             restoreOldPos(old_x, old_y);
             board[old_x][old_y].setHero(false);
             processNewPos(new_x, new_y + _boardCellWidth, heroIndex, new int[]{heroPositions[targetHeroIndex][0], heroPositions[targetHeroIndex][1] + 1});
@@ -405,12 +405,12 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
             board[old_x][old_y].setHero(false);
             processNewPos(new_x + _boardCellHeight, new_y, heroIndex, new int[]{heroPositions[targetHeroIndex][0] + 1, heroPositions[targetHeroIndex][1]});
         } else if (board[new_x][new_y - _boardCellWidth].isMonster() || board[new_x][new_y - _boardCellWidth].isBush() || board[new_x][new_y - _boardCellWidth].isCave()
-                || board[new_x][new_y - _boardCellWidth].isKoulou() || board[new_x][new_y - _boardCellWidth].isEmpty()) {
+                || board[new_x][new_y - _boardCellWidth].isKoulou() || board[new_x][new_y - _boardCellWidth].isEmpty() || board[new_x][new_y - _boardCellWidth].isHeroNexus()) {
             restoreOldPos(old_x, old_y);
             board[old_x][old_y].setHero(false);
             processNewPos(new_x, new_y - _boardCellWidth, heroIndex, new int[]{heroPositions[targetHeroIndex][0], heroPositions[targetHeroIndex][1] - 1});
         } else if (board[new_x][new_y + _boardCellWidth].isMonster() || board[new_x][new_y + _boardCellWidth].isBush() || board[new_x][new_y + _boardCellWidth].isCave()
-                || board[new_x][new_y + _boardCellWidth].isKoulou() || board[new_x][new_y + _boardCellWidth].isEmpty()) {
+                || board[new_x][new_y + _boardCellWidth].isKoulou() || board[new_x][new_y + _boardCellWidth].isEmpty() || board[new_x][new_y + _boardCellWidth].isHeroNexus()) {
             restoreOldPos(old_x, old_y);
             board[old_x][old_y].setHero(false);
             processNewPos(new_x, new_y + _boardCellWidth, heroIndex, new int[]{heroPositions[targetHeroIndex][0], heroPositions[targetHeroIndex][1] + 1});

@@ -14,6 +14,9 @@ public class GameLV extends BattleTurnBasedGame {
     Printer pr = new Printer();
 
     private ArrayList<Integer> validLane = new ArrayList<>();
+
+    private int[] laneHeroNum;
+
     private BoardWorldMap currentWorldMap;
     private TeamHero currentHeroTeam;
     private QueueBattle currentQueueBattle;
@@ -31,6 +34,7 @@ public class GameLV extends BattleTurnBasedGame {
         this.currentWorldMap.initializeBoard();
         this.currentWorldMap.initializeWorld();
         this.numCreature = currentWorldMap.getNumCreature();
+        this.laneHeroNum = new int[numCreature];
         this.currentWorldMap.printBoard();
         System.out.println(pr.BLUE + "Welcome to this new world full of opportunity, danger, and of course, FUN! ENJOY!" + pr.RESET);
         System.out.println(pr.PURPLE + "H" + pr.RESET + " : This represents your teams and they will be starting at their Nexuses.");
@@ -61,8 +65,10 @@ public class GameLV extends BattleTurnBasedGame {
                 market.initializeMarket(allWeapons, allArmors, allPotions, allFireSpells, allIceSpells, allLightningSpells);
             }
             System.out.println("RULE: The game ends when one of the heroes reaches the enemies' nexus! ONWARD!");
-            for (int i = 0; i < numCreature; i++)
+            for (int i = 0; i < numCreature; i++) {
                 this.validLane.add(i);
+                this.laneHeroNum[i] = 1;
+            }
         }
         // Re-initialize map
         else {
@@ -135,6 +141,8 @@ public class GameLV extends BattleTurnBasedGame {
                 // Recall
                 if (moveLine.equals("b") || moveLine.equals("B")) {
                     currentWorldMap.heroRecall(heroIndex);
+                    laneHeroNum[heroIndex]++;
+                    laneHeroNum[currentHeroTeam.getTeamMembers().get(heroIndex).getWasAt()]--;
                     validLane.add(heroIndex);
                     currentWorldMap.printBoard();
                     heroIndex++;
@@ -144,7 +152,17 @@ public class GameLV extends BattleTurnBasedGame {
                 if (moveLine.equals("t") || moveLine.equals("T")) {
                     System.out.print("Where do you want to teleport? 1-" + numCreature + ": ");
                     String targetLine = in.nextLine();
-                    int targetLine_int = Integer.parseInt(targetLine);
+                    int targetLine_int = 0;
+                    while(true) {
+                        try {
+                            targetLine_int = Integer.parseInt(targetLine);
+                            break;
+                        } catch (Exception e) {
+                            System.out.print("Where do you want to teleport? 1-" + numCreature + ": ");
+                            targetLine = in.nextLine();
+                            continue;
+                        }
+                    }
                     while (targetLine_int < 1 || targetLine_int > numCreature) {
                         System.out.print("That did not look like a valid choice, please enter 1-" + numCreature + ": ");
                         targetLine = in.nextLine();
@@ -155,11 +173,19 @@ public class GameLV extends BattleTurnBasedGame {
                         targetLine = in.nextLine();
                         targetLine_int = Integer.parseInt(targetLine);
                     }
+                    while (laneHeroNum[targetLine_int - 1] >= 3) {
+                        System.out.print("This lane has too many heroes, try another one 1-" + numCreature + ": ");
+                        targetLine = in.nextLine();
+                        targetLine_int = Integer.parseInt(targetLine);
+                    }
                     if (targetLine_int - 1 == heroIndex) {
-                        currentWorldMap.heroTeleport(heroIndex, targetLine_int - 1);
-                        System.out.println(pr.CYAN + "You have teleported to the same lane..." + pr.RESET);
+                        currentWorldMap.heroRecall(heroIndex);
+                        System.out.println(pr.CYAN + "You cannot teleport to the same lane...Sending you back to nexus" + pr.RESET);
                     } else {
                         currentWorldMap.heroTeleport(heroIndex, targetLine_int - 1);
+                        currentHeroTeam.getTeamMembers().get(heroIndex).setWasAt(targetLine_int - 1);
+                        laneHeroNum[targetLine_int - 1]++;
+                        laneHeroNum[heroIndex]--;
                         validLane.remove(Integer.valueOf(heroIndex));
                     }
                     currentWorldMap.printBoard();

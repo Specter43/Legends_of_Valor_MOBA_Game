@@ -13,6 +13,8 @@ public abstract class Hero extends Role implements Attack<Monster> {
     private HeroWeapons weapons;
     private int handsLeft;
     private HeroArmors armors;
+
+    private int wasAt;
     Printer pr = new Printer();
 
     public Hero(String name, int level, double HP, double strength, double defense, double agility, double MP, double experience, double dexterity, double gold, Inventory<Item> inventory, HeroWeapons weapons, int handsLeft, HeroArmors armors) {
@@ -67,6 +69,8 @@ public abstract class Hero extends Role implements Attack<Monster> {
     public HeroArmors getArmors() {
         return armors;
     }
+    public int getWasAt() {return wasAt;}
+    public void setWasAt(int wasAt) {this.wasAt = wasAt;}
 
     public void levelUp() {
         if (experience >= experienceUpbound) {
