@@ -53,9 +53,10 @@ TeamMonster.java: A Class representing a team of monsters.
 1. <Files to be parsed should be stored in ConfigFiles, for parser class to
 read class>
 2. <Bonus Done:
-    (1): Colorful Output
-    (2): Regenerate Map if not wanted
-    (3): Dynamic attack range
+    (1): Colorful Output.
+    (2): Regenerate Map if not wanted.
+    (3): Dynamic attack range.
+    (4): Allow for more than 3 heroes to player.
 >
 3. <Notes to grader>
     (1): Did not follow the game balance rules instructed by the handout,

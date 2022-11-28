@@ -14,7 +14,6 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
     private final HashMap<String, Market> markets;
     private final int laneWidth;
     private final int inaccessibleWidth;
-
     private int numCreature;
     private int[][] heroPositions;
     private int[][] heroOriginalPos;
@@ -36,9 +35,9 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         this.bushPercentage = 0.05;
         this.cavePercentage = 0.05;
         this.koulouPercentage= 0.05;
-        this.heroPositions = new int[][]{{h, 0}, {h, 3}, {h, 6}};
-        this.heroOriginalPos = new int[][]{{h, 0}, {h, 3}, {h, 6}};
-        this.monsterPositions = new int[][]{{0, 0}, {0, 3}, {0, 6}};
+        this.heroPositions = new int[][]{{h, 0}, {h, 3}, {h, 6}, {h, 9}, {h, 12}};
+        this.heroOriginalPos = new int[][]{{h, 0}, {h, 3}, {h, 6}, {h, 9}, {h, 12}};
+        this.monsterPositions = new int[][]{{0, 0}, {0, 3}, {0, 6}, {0, 9}, {0, 12}};
         this.markets = new HashMap<String, Market>();
         this.board = (T[][]) new CellLV[_boardCellHeight*h+1][_boardCellWidth*w+1];
     }
@@ -359,7 +358,7 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
 
         if (targetHeroIndex == 0 && heroPositions[targetHeroIndex][1] == 0) {
             checkRightCell(new_x, new_y, old_x, old_y, heroIndex, targetHeroIndex);
-        } else if (targetHeroIndex == 2 && heroPositions[targetHeroIndex][1] == getWidth() - 1) {
+        } else if (targetHeroIndex == numCreature-1 && heroPositions[targetHeroIndex][1] == getWidth() - 1) {
             checkLeftCell(new_x, new_y, old_x, old_y, heroIndex, targetHeroIndex);
         } else {
             checkLeftRightCell(new_x, new_y, old_x, old_y, heroIndex, targetHeroIndex);

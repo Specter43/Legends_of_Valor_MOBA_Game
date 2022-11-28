@@ -17,13 +17,11 @@ public class GameLV extends BattleTurnBasedGame {
     private BoardWorldMap currentWorldMap;
     private TeamHero currentHeroTeam;
     private QueueBattle currentQueueBattle;
-    private double encounterBattleChance;
     private int numCreature;
 
     public GameLV(TeamHero currentHeroTeam) {
-        this.currentWorldMap = new BoardWorldMap(8, 8);
+        this.currentWorldMap = new BoardWorldMap(8, currentHeroTeam.getTeamSize()*2+(currentHeroTeam.getTeamSize()-1));
         this.currentHeroTeam = currentHeroTeam;
-        this.encounterBattleChance = 0.2;
         this.numCreature = 0;
     }
 
@@ -62,7 +60,7 @@ public class GameLV extends BattleTurnBasedGame {
                 Market market = (Market) currentWorldMap.getMarkets().get(pos);
                 market.initializeMarket(allWeapons, allArmors, allPotions, allFireSpells, allIceSpells, allLightningSpells);
             }
-            System.out.println("RULE: The game only ends when all of your team faint. Stay Alive!");
+            System.out.println("RULE: The game ends when one of the heroes reaches the enemies' nexus! ONWARD!");
             for (int i = 0; i < numCreature; i++)
                 this.validLane.add(i);
         }
