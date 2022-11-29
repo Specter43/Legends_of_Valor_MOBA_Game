@@ -18,6 +18,7 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
     private int[][] heroPositions;
     private int[][] heroOriginalPos;
     private int[][] monsterPositions;
+    private final int[][] monsterOriginalPos;
     Printer pr = new Printer();
 
     /**
@@ -39,10 +40,12 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         this.heroPositions = new int[teamSize][];
         this.heroOriginalPos = new int[teamSize][];
         this.monsterPositions = new int[teamSize][];
+        this.monsterOriginalPos = new int[teamSize][];
         for (int i = 0; i < (w+1)/3; i++) {
             this.heroPositions[i] = new int[]{h, i*3};
             this.heroOriginalPos[i] = new int[]{h, i*3};
             this.monsterPositions[i] = new int[]{0, i*3};
+            this.monsterOriginalPos[i] = new int[]{0, i*3};
         }
         this.markets = new HashMap<String, Market>();
         this.board = (T[][]) new CellLV[_boardCellHeight*h+1][_boardCellWidth*w+1];
@@ -450,13 +453,19 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         return null;
     }
 
-    public void removeMonster(int heroIndex) {
-        int x = _boardCellHeight * monsterPositions[heroIndex][0] + 1;
-        int y = _boardCellWidth * monsterPositions[heroIndex][1] + 2;
+    public void removeMonster(int monsterIndex) {
+        int x = _boardCellHeight * monsterPositions[monsterIndex][0] + 1;
+        int y = _boardCellWidth * monsterPositions[monsterIndex][1] + 2;
         board[x][y].setMonster(false);
         restoreOldPos(x, y);
-        monsterPositions[heroIndex][0] = -1;
-        monsterPositions[heroIndex][1] = -1;
+        monsterPositions[monsterIndex][0] = -1;
+        monsterPositions[monsterIndex][1] = -1;
+    }
+    
+    public void monsterSpawn(int monsterIndex) {
+        board[1][_boardCellWidth*monsterOriginalPos[monsterIndex][1]+2].setContent(pr.RED_BG + "M" + pr.RESET);
+        board[1][_boardCellWidth*monsterOriginalPos[monsterIndex][1]+2].setMonster(true);
+        monsterPositions[monsterIndex] = monsterOriginalPos[monsterIndex];
     }
 
     public boolean heroAtHeroNexus(int heroIndex) {

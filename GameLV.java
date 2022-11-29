@@ -1,5 +1,4 @@
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.lang.System.exit;
 
@@ -18,12 +17,12 @@ public class GameLV extends BattleTurnBasedGame {
     private BoardWorldMap currentWorldMap;
     private TeamHero currentHeroTeam;
     private QueueBattle currentQueueBattle;
-    private int numCreature;
+    private int monsterSpawnRounds;
 
     public GameLV(TeamHero currentHeroTeam) {
         this.currentWorldMap = new BoardWorldMap(8, currentHeroTeam.getTeamSize()*2+(currentHeroTeam.getTeamSize()-1));
         this.currentHeroTeam = currentHeroTeam;
-        this.numCreature = 0;
+        this.monsterSpawnRounds = currentWorldMap.height;
     }
 
     @Override
@@ -31,8 +30,7 @@ public class GameLV extends BattleTurnBasedGame {
         Scanner in = new Scanner(System.in);
         this.currentWorldMap.initializeBoard();
         this.currentWorldMap.initializeWorld();
-        this.numCreature = currentWorldMap.getNumCreature();
-        this.laneHeroNum = new int[numCreature];
+        this.laneHeroNum = new int[currentWorldMap.getNumCreature()];
         this.currentWorldMap.printBoard();
         System.out.println(pr.BLUE + "Welcome to this new world full of opportunity, danger, and of course, FUN! ENJOY!" + pr.RESET);
         System.out.println(pr.PURPLE + "H" + pr.RESET + " : This represents your teams and they will be starting at their Nexuses.");
@@ -63,7 +61,7 @@ public class GameLV extends BattleTurnBasedGame {
                 market.initializeMarket(allWeapons, allArmors, allPotions, allFireSpells, allIceSpells, allLightningSpells);
             }
             System.out.println("RULE: The game ends when one of the heroes reaches the enemies' nexus! ONWARD!");
-            for (int i = 0; i < numCreature; i++) {
+            for (int i = 0; i < currentWorldMap.getNumCreature(); i++) {
                 this.validLane.add(i);
                 this.laneHeroNum[i] = 1;
             }
@@ -152,21 +150,21 @@ public class GameLV extends BattleTurnBasedGame {
 
                 // Teleport
                 if (moveLine.equals("t") || moveLine.equals("T")) {
-                    System.out.print("Where do you want to teleport? 1-" + numCreature + ": ");
+                    System.out.print("Where do you want to teleport? 1-" + currentWorldMap.getNumCreature() + ": ");
                     String targetLine = in.nextLine();
                     int targetLine_int = stringToInt(targetLine, in);
-                    while (targetLine_int < 1 || targetLine_int > numCreature) {
-                        System.out.print("That did not look like a valid choice, please enter 1-" + numCreature + ": ");
+                    while (targetLine_int < 1 || targetLine_int > currentWorldMap.getNumCreature()) {
+                        System.out.print("That did not look like a valid choice, please enter 1-" + currentWorldMap.getNumCreature() + ": ");
                         targetLine = in.nextLine();
                         targetLine_int = stringToInt(targetLine, in);
                     }
                     while(!validLane.contains(targetLine_int - 1)) {
-                        System.out.print("Cannot teleport to that lane, try another one 1-" + numCreature + ": ");
+                        System.out.print("Cannot teleport to that lane, try another one 1-" + currentWorldMap.getNumCreature() + ": ");
                         targetLine = in.nextLine();
                         targetLine_int = stringToInt(targetLine, in);
                     }
                     while (laneHeroNum[targetLine_int - 1] >= 3) {
-                        System.out.print("This lane has too many heroes, try another one 1-" + numCreature + ": ");
+                        System.out.print("This lane has too many heroes, try another one 1-" + currentWorldMap.getNumCreature() + ": ");
                         targetLine = in.nextLine();
                         targetLine_int = stringToInt(targetLine, in);
                     }
@@ -202,12 +200,21 @@ public class GameLV extends BattleTurnBasedGame {
                     market.marketPrompt(currentHeroTeam);
                 }
             }
-            if (heroIndex > numCreature - 1) break;
+            if (heroIndex > currentWorldMap.getNumCreature() - 1) break;
         }
 
         // Monster move
-        for (int i = 0; i < numCreature; i++) {
+        monsterSpawnRounds--;
+        for (int i = 0; i < currentWorldMap.getNumCreature(); i++) {
             currentWorldMap.monsterMove(i);
+            // Monster spawn
+            if (monsterSpawnRounds == 0) {
+                currentWorldMap.monsterSpawn(i);
+                if (i == currentWorldMap.getNumCreature()-1) {
+                    monsterSpawnRounds = currentWorldMap.height;
+                }
+            }
+            // Monster at nexus
             if (currentWorldMap.monsterAtHeroNexus(i)) {
                 System.out.println(pr.RED + "Your Nexus has been destroyed!" + pr.RESET);
                 setGameOver(true);
@@ -220,7 +227,7 @@ public class GameLV extends BattleTurnBasedGame {
     public void battlePrompt(int heroIndex) {
         Scanner in = new Scanner(System.in);
         // Initialize monster team and show status
-        System.out.println(pr.CYAN + "Your team encounters a team of monsters, let the battle commence!\n" + pr.RESET);
+        System.out.println(pr.CYAN + "Your team encounters a team of monsters, let the battle commence!" + pr.RESET);
         TeamMonster teamMonster = new TeamMonster("Monsters");
         teamMonster.initializeMonsterTeam(currentHeroTeam.highestLevel(), 1);
 
@@ -229,12 +236,12 @@ public class GameLV extends BattleTurnBasedGame {
         this.currentQueueBattle = queueBattle;
 
         // Battle takes turns
-        while (!currentHeroTeam.allHeroesFainted() && !teamMonster.allMonstersFainted()) {
+        Hero currentHero = currentHeroTeam.getTeamMembers().get(heroIndex);
+        while (currentHero.getHP() > 0 && !teamMonster.allMonstersFainted()) {
             ArrayList<Object> currentRole = queueBattle.nextTurn();
             if (currentRole.get(0).equals("Hero")) {
-                Hero currentHero = (Hero) currentRole.get(1);
                 if (currentHero.getHP() > 0) {
-                    System.out.printf("It's " + pr.GREEN + "%s"  + pr.RESET + "'s turn!\n\n", currentHero.getName());
+                    System.out.printf("\nIt's " + pr.GREEN + "%s"  + pr.RESET + "'s turn!\n\n", currentHero.getName());
                     currentHero.showHeroStatus();
                     teamMonster.showTeamStatus();
                     while (true) {
@@ -377,12 +384,10 @@ public class GameLV extends BattleTurnBasedGame {
                     }
                 }
             } else {
-                Random rand = new Random();
                 Monster monster = (Monster) currentRole.get(1);
                 if (monster.getHP() > 0) {
-                    System.out.printf("It's " + pr.RED + "%s"  + pr.RESET + "'s turn!\n", monster.getName());
-                    Hero heroToAttack = currentHeroTeam.getTeamMembers().get(rand.nextInt(currentHeroTeam.getTeamSize()));
-                    monster.attack(heroToAttack);
+                    System.out.printf("\nIt's " + pr.RED + "%s"  + pr.RESET + "'s turn!\n\n", monster.getName());
+                    monster.attack(currentHero);
                 }
             }
         }
@@ -396,7 +401,6 @@ public class GameLV extends BattleTurnBasedGame {
         }
 
         // Regain health and mana and Gain experience and gold
-        Hero currentHero = currentHeroTeam.getTeamMembers().get(heroIndex);
         currentHero.setExperience(currentHero.getExperience()+(2*teamMonster.getTeamSize()));
         System.out.printf(pr.GREEN + "%s"  + pr.RESET + " has gained %d experience!\n", currentHero.getName(), 2*teamMonster.getTeamSize());
         if (currentHero.getHP() > 0) {
@@ -408,6 +412,11 @@ public class GameLV extends BattleTurnBasedGame {
             System.out.print(pr.GREEN + currentHero.getName() + pr.RESET + " has finished the turn! Regain HP and MP by 10%.\n");
             currentHero.setGold(currentHero.getGold() + currentHeroTeam.highestLevel()*100);
             System.out.printf(pr.GREEN + "%s"  + pr.RESET + " has gained %d gold!\n", currentHero.getName(), currentHeroTeam.highestLevel()*100);
+        } else {
+            // Revive
+            System.out.printf(pr.GREEN + "%s" + pr.RESET + " has respawned!\n", currentHero.getName());
+            currentHero.setHP(300);
+            currentWorldMap.heroRecall(heroIndex);
         }
         currentHero.levelUp();
 
@@ -428,7 +437,7 @@ public class GameLV extends BattleTurnBasedGame {
                 input_int = Integer.parseInt(s);
                 break;
             } catch (Exception e) {
-                System.out.print("That did not look like a valid choice. Please enter integer in the range of 1-" + numCreature +
+                System.out.print("That did not look like a valid choice. Please enter integer in the range of 1-" + currentWorldMap.getNumCreature() +
                         ", cannot teleport to lane with no hero, cannot teleport to a lane that has more than 3 heroes: ");
                 s = in.nextLine();
                 continue;

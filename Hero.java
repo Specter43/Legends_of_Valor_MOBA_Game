@@ -99,7 +99,7 @@ public abstract class Hero extends Role implements Attack<Monster> {
 
     @Override
     public void attack(Monster monster) {
-        double monsterDodge = monster.getAgility()*0.1;
+        double monsterDodge = monster.getAgility()*100;
         Random rand = new Random();
         if (rand.nextInt(100) <= monsterDodge) {
             System.out.print(pr.RED + "Your attack missed!\n" + pr.RESET);

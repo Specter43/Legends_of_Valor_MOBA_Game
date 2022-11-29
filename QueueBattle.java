@@ -20,7 +20,7 @@ public class QueueBattle extends Queue {
         this.battleTeamNameQueue = new ArrayList<>();
         this.battleTeamNameQueue.add("Heroes");
         this.battleTeamNameQueue.add("Monsters");
-        this.teamSize = teamHero.getTeamSize();
+        this.teamSize = copyTeamHero.size();
         this.tempTeamMember = new ArrayList<>();
     }
 
