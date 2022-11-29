@@ -152,31 +152,21 @@ public class GameLV extends BattleTurnBasedGame {
                 if (moveLine.equals("t") || moveLine.equals("T")) {
                     System.out.print("Where do you want to teleport? 1-" + numCreature + ": ");
                     String targetLine = in.nextLine();
-                    int targetLine_int = 0;
-                    while(true) {
-                        try {
-                            targetLine_int = Integer.parseInt(targetLine);
-                            break;
-                        } catch (Exception e) {
-                            System.out.print("Where do you want to teleport? 1-" + numCreature + ": ");
-                            targetLine = in.nextLine();
-                            continue;
-                        }
-                    }
+                    int targetLine_int = stringToInt(targetLine, in);
                     while (targetLine_int < 1 || targetLine_int > numCreature) {
                         System.out.print("That did not look like a valid choice, please enter 1-" + numCreature + ": ");
                         targetLine = in.nextLine();
-                        targetLine_int = Integer.parseInt(targetLine);
+                        targetLine_int = stringToInt(targetLine, in);
                     }
                     while(!validLane.contains(targetLine_int - 1)) {
                         System.out.print("Cannot teleport to that lane, try another one 1-" + numCreature + ": ");
                         targetLine = in.nextLine();
-                        targetLine_int = Integer.parseInt(targetLine);
+                        targetLine_int = stringToInt(targetLine, in);
                     }
                     while (laneHeroNum[targetLine_int - 1] >= 3) {
                         System.out.print("This lane has too many heroes, try another one 1-" + numCreature + ": ");
                         targetLine = in.nextLine();
-                        targetLine_int = Integer.parseInt(targetLine);
+                        targetLine_int = stringToInt(targetLine, in);
                     }
                     if (targetLine_int - 1 == heroIndex) {
                         currentWorldMap.heroRecall(heroIndex);
@@ -424,5 +414,21 @@ public class GameLV extends BattleTurnBasedGame {
     @Override
     public boolean gameEnd() {
         return currentHeroTeam.allHeroesFainted();
+    }
+
+    private int stringToInt(String s, Scanner in) {
+        int input_int = 0;
+        while (true) {
+            try {
+                input_int = Integer.parseInt(s);
+                break;
+            } catch (Exception e) {
+                System.out.print("That did not look like a valid choice. Please enter integer in the range of 1-" + numCreature +
+                        ", cannot teleport to lane with no hero, cannot teleport to a lane that has more than 3 heroes: ");
+                s = in.nextLine();
+                continue;
+            }
+        }
+        return input_int;
     }
 }
