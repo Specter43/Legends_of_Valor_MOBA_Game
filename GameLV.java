@@ -435,8 +435,7 @@ public class GameLV extends BattleTurnBasedGame {
                 input_int = Integer.parseInt(s);
                 break;
             } catch (Exception e) {
-                System.out.print("That did not look like a valid choice. Please enter integer in the range of 1-" + currentWorldMap.getNumCreature() +
-                        ", cannot teleport to lane with no hero, cannot teleport to a lane that has more than 3 heroes: ");
+                System.out.print("That did not look like a valid choice, please enter a integer: ");
                 s = in.nextLine();
                 continue;
             }
