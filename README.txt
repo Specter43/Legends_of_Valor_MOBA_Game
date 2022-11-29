@@ -6,22 +6,34 @@
 <U41174832>
 
 <DUODUO XU>
+<xudd@bu.edu>
+<U24826440>
 
 ## Files
 ---------------------------------------------------------------------------
 Attack.java: An Interface to instruct that a Role class should be able to attack.
-QueueBattle.java: A Class representing a queue for turn based battle game.
 BattleTurnBasedGame.java: An abstract class representing a turn based battle game.
 Board.java: A Class representing a board.
 BoardFunction.java: An Interface restricting behaviors of every board.
+BoardLane.java:  A class representing a lane in a board of Legends of Valor.
 BoardWorldMap.java: A Class representing a world map for Legends of Valor game.
 Cell.java: An abstract class representing a general cell in a board.
 CellLV.java: A Class representing a cell in Legends of Valor game.
+CellLVBorder.java: A Class representing a border cell in Legends of Valor.
+CellLVBush.java: A Class representing a bush cell in Legends of Valor.
+CellLVCave.java: A Class representing a cave cell in Legends of Valor.
+CellLVHeroNexus.java: A Class representing a hero nexus cell in Legends of Valor.
+CellLVInaccessible.java: A Class representing an inaccessible cell in Legends of Valor.
+CellLVKoulou.java: A Class representing a koulou cell in Legends of Valor.
+CellLVMonsterNexus.java: A Class representing a monster nexus cell in Legends of Valor.
+CellLVNexus.java: An abstract class representing a nexus class.
+CellLVPlain.java: A Class representing a plain cell in Legends of Valor.
 Equipment.java: An abstract class representing a general equipment.
 EquipmentArmor.java: A Class representing an equipment armor.
 EquipmentWeapon.java: A Class representing an equipment weapon.
 Game.java: An abstract class representing a general game.
 GameLV.java: A Class representing an instance of a Legends of Valor game.
+GameLVPlayer.java: A Class representing a player of Legends of Valor.
 Hero.java: An abstract class representing a general hero.
 HeroArmors.java: A class representing the armors a hero is wearing.
 HeroPaladin.java: A Class representing a Paladin.
@@ -44,7 +56,10 @@ Monster.java: An abstract class representing a general monster.
 MonsterDragon.java: A Class representing a dragon.
 MonsterExoskeleton.java: A Class representing an exoskeleton.
 MonsterSpirit.java: A Class representing a spirit.
+Player.java: A Class representing a player of Legends of Valor.
 Printer.java: A Class for storing color strings.
+Queue: A abstract class representing a general queue.
+QueueBattle.java: A Class representing a queue for turn based battle game.
 Role.java: An abstract class representing a general role.
 Team.java: A Class representing a Team.
 TeamHero.java: A Class representing a team of heroes.
