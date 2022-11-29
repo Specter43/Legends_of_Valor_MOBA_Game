@@ -11,9 +11,9 @@ public class QueueBattle extends Queue {
     private int teamSize;
     private ArrayList<Role> tempTeamMember;
 
-    public QueueBattle(TeamHero teamHero, TeamMonster teamMonster) {
+    public QueueBattle(TeamHero teamHero, TeamMonster teamMonster, int heroIndex) {
         this.battleQueue = new ArrayList<>();
-        List<Role> copyTeamHero = new ArrayList<>(teamHero.getTeamMembers());
+        List<Role> copyTeamHero = new ArrayList(){{add(teamHero.getTeamMembers().get(heroIndex));}};
         List<Role> copyTeamMonster = new ArrayList<>(teamMonster.getTeamMembers());
         this.battleQueue.add(copyTeamHero);
         this.battleQueue.add(copyTeamMonster);

@@ -35,9 +35,15 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         this.bushPercentage = 0.05;
         this.cavePercentage = 0.05;
         this.koulouPercentage= 0.05;
-        this.heroPositions = new int[][]{{h, 0}, {h, 3}, {h, 6}, {h, 9}, {h, 12}};
-        this.heroOriginalPos = new int[][]{{h, 0}, {h, 3}, {h, 6}, {h, 9}, {h, 12}};
-        this.monsterPositions = new int[][]{{0, 0}, {0, 3}, {0, 6}, {0, 9}, {0, 12}};
+        int teamSize = (w+1)/3;
+        this.heroPositions = new int[teamSize][];
+        this.heroOriginalPos = new int[teamSize][];
+        this.monsterPositions = new int[teamSize][];
+        for (int i = 0; i < (w+1)/3; i++) {
+            this.heroPositions[i] = new int[]{h, i*3};
+            this.heroOriginalPos[i] = new int[]{h, i*3};
+            this.monsterPositions[i] = new int[]{0, i*3};
+        }
         this.markets = new HashMap<String, Market>();
         this.board = (T[][]) new CellLV[_boardCellHeight*h+1][_boardCellWidth*w+1];
     }
@@ -55,6 +61,9 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         return heroPositions;
     }
     public int getNumCreature() {return numCreature; }
+    public int[][] getMonsterPositions() {
+        return monsterPositions;
+    }
 
     /**
      * Initialize an empty world map.
@@ -285,6 +294,9 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
     }
 
     public void monsterMove(int monsterIndex) {
+        if (monsterPositions[monsterIndex][0] == -1 && monsterPositions[monsterIndex][1] == -1) {
+            return;
+        }
         int[] newPos = new int[]{monsterPositions[monsterIndex][0] + 1, monsterPositions[monsterIndex][1]};
         int old_x = _boardCellHeight * monsterPositions[monsterIndex][0] + 1;
         int old_y = _boardCellWidth * monsterPositions[monsterIndex][1] + 2;
@@ -438,20 +450,24 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         return null;
     }
 
+    public void removeMonster(int heroIndex) {
+        int x = _boardCellHeight * monsterPositions[heroIndex][0] + 1;
+        int y = _boardCellWidth * monsterPositions[heroIndex][1] + 2;
+        board[x][y].setMonster(false);
+        restoreOldPos(x, y);
+        monsterPositions[heroIndex][0] = -1;
+        monsterPositions[heroIndex][1] = -1;
+    }
+
     public boolean heroAtHeroNexus(int heroIndex) {
         return board[_boardCellHeight*heroPositions[heroIndex][0]+1][_boardCellWidth*heroPositions[heroIndex][1]+2] instanceof CellLVHeroNexus;
     }
 
-    public boolean heroAtBush(int heroIndex) {
-        return board[_boardCellHeight*heroPositions[heroIndex][0]+1][_boardCellWidth*heroPositions[heroIndex][1]+2] instanceof CellLVBush;
-    }
-
-    public boolean heroAtCave(int heroIndex) {
-        return board[_boardCellHeight*heroPositions[heroIndex][0]+1][_boardCellWidth*heroPositions[heroIndex][1]+2] instanceof CellLVCave;
-    }
-
-    public boolean heroAtKoulou(int heroIndex) {
-        return board[_boardCellHeight*heroPositions[heroIndex][0]+1][_boardCellWidth*heroPositions[heroIndex][1]+2] instanceof CellLVKoulou;
+    public boolean monsterAtHeroNexus(int monsterIndex) {
+        if (monsterPositions[monsterIndex][0] != -1 && monsterPositions[monsterIndex][1] != -1) {
+            return board[_boardCellHeight*monsterPositions[monsterIndex][0]+1][_boardCellWidth*monsterPositions[monsterIndex][1]+2] instanceof CellLVHeroNexus;
+        }
+        return false;
     }
 
     public boolean heroAtMonsterNexus(int heroIndex) {

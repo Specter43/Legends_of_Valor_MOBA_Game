@@ -14,9 +14,7 @@ public class GameLV extends BattleTurnBasedGame {
     Printer pr = new Printer();
 
     private ArrayList<Integer> validLane = new ArrayList<>();
-
     private int[] laneHeroNum;
-
     private BoardWorldMap currentWorldMap;
     private TeamHero currentHeroTeam;
     private QueueBattle currentQueueBattle;
@@ -122,15 +120,19 @@ public class GameLV extends BattleTurnBasedGame {
 
                 if (moveLine.equals("K")) {
                     // Attack logic
-                    System.out.println("ATTACK!");
-                    //battlePrompt();
+                    battlePrompt(heroIndex);
                 } else {
                     // Move logic
                     String moveToCellStatus = currentWorldMap.heroMove(moveLine, currentHeroTeam, heroIndex);
                     currentWorldMap.printBoard();
+                    if (currentWorldMap.heroAtMonsterNexus(heroIndex)) {
+                        setGameOver(true);
+                        System.out.println(pr.GREEN + "Your team has destroyed their Nexus!" + pr.RESET);
+                        return "Game Over";
+                    }
                     boolean encounterBattle = moveToCellStatus.equals("Monster");
                     if (encounterBattle) {
-                        //battlePrompt();
+                        battlePrompt(heroIndex);
                     }
                 }
                 // Only consume round when hero make a move
@@ -206,23 +208,24 @@ public class GameLV extends BattleTurnBasedGame {
         // Monster move
         for (int i = 0; i < numCreature; i++) {
             currentWorldMap.monsterMove(i);
+            if (currentWorldMap.monsterAtHeroNexus(i)) {
+                System.out.println(pr.RED + "Your Nexus has been destroyed!" + pr.RESET);
+                setGameOver(true);
+                return "Game Over";
+            }
         }
         return null;
     }
 
-    public void battlePrompt() {
+    public void battlePrompt(int heroIndex) {
         Scanner in = new Scanner(System.in);
         // Initialize monster team and show status
         System.out.println(pr.CYAN + "Your team encounters a team of monsters, let the battle commence!\n" + pr.RESET);
-        currentHeroTeam.showTeamStatus();
-        System.out.println();
         TeamMonster teamMonster = new TeamMonster("Monsters");
-        teamMonster.initializeMonsterTeam(currentHeroTeam.highestLevel(), currentHeroTeam.getTeamSize());
-        teamMonster.showTeamStatus();
-        System.out.println();
+        teamMonster.initializeMonsterTeam(currentHeroTeam.highestLevel(), 1);
 
         // Initialize Battle Queue
-        QueueBattle queueBattle = new QueueBattle(currentHeroTeam, teamMonster);
+        QueueBattle queueBattle = new QueueBattle(currentHeroTeam, teamMonster, heroIndex);
         this.currentQueueBattle = queueBattle;
 
         // Battle takes turns
@@ -231,8 +234,8 @@ public class GameLV extends BattleTurnBasedGame {
             if (currentRole.get(0).equals("Hero")) {
                 Hero currentHero = (Hero) currentRole.get(1);
                 if (currentHero.getHP() > 0) {
-                    System.out.printf("\nIt's " + pr.GREEN + "%s"  + pr.RESET + "'s turn!\n", currentHero.getName());
-                    currentHeroTeam.showTeamStatus();
+                    System.out.printf("It's " + pr.GREEN + "%s"  + pr.RESET + "'s turn!\n\n", currentHero.getName());
+                    currentHero.showHeroStatus();
                     teamMonster.showTeamStatus();
                     while (true) {
                         System.out.println("You may choose one of the following actions to perform:");
@@ -387,28 +390,30 @@ public class GameLV extends BattleTurnBasedGame {
         // Battle End
         System.out.println(pr.CYAN + "\nThe battle has concluded!" + pr.RESET);
         if (gameEnd()) {
-            System.out.println("All heroes have fainted! You lost...");
+            System.out.println(pr.RED + "All heroes have fainted! You lost..." + pr.RESET);
             setGameOver(true);
             return;
         }
 
         // Regain health and mana and Gain experience and gold
-        for (Hero hero : currentHeroTeam.getTeamMembers()) {
-            // Experience and gold
-            hero.setExperience(hero.getExperience()+(2*teamMonster.getTeamSize()));
-            System.out.printf(pr.GREEN + "%s"  + pr.RESET + " has gained %d experience!\n", hero.getName(), 2*teamMonster.getTeamSize());
-            if (hero.getHP() > 0) {
-                //Regain 10% HP and MP at end of each round
-                hero.setHP(hero.getHP() * 1.1);
-                hero.setMP(hero.getMP() * 1.1);
+        Hero currentHero = currentHeroTeam.getTeamMembers().get(heroIndex);
+        currentHero.setExperience(currentHero.getExperience()+(2*teamMonster.getTeamSize()));
+        System.out.printf(pr.GREEN + "%s"  + pr.RESET + " has gained %d experience!\n", currentHero.getName(), 2*teamMonster.getTeamSize());
+        if (currentHero.getHP() > 0) {
+            //Regain 10% HP and MP at end of each round
+            currentHero.setHP(currentHero.getHP() * 1.1);
+            currentHero.setMP(currentHero.getMP() * 1.1);
 
-                // Gain gold
-                System.out.print(pr.GREEN + hero.getName() + pr.RESET + " has finished the turn! Regain HP and MP by 10%.\n");
-                hero.setGold(hero.getGold() + currentHeroTeam.highestLevel()*100);
-                System.out.printf(pr.GREEN + "%s"  + pr.RESET + " has gained %d gold!\n", hero.getName(), currentHeroTeam.highestLevel()*100);
-            }
-            hero.levelUp();
+            // Gain gold
+            System.out.print(pr.GREEN + currentHero.getName() + pr.RESET + " has finished the turn! Regain HP and MP by 10%.\n");
+            currentHero.setGold(currentHero.getGold() + currentHeroTeam.highestLevel()*100);
+            System.out.printf(pr.GREEN + "%s"  + pr.RESET + " has gained %d gold!\n", currentHero.getName(), currentHeroTeam.highestLevel()*100);
         }
+        currentHero.levelUp();
+
+        // Set board
+        currentWorldMap.removeMonster(heroIndex);
+        currentWorldMap.printBoard();
     }
 
     @Override
