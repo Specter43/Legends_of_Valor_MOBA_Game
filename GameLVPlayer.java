@@ -1,3 +1,6 @@
+/**
+ * A Class representing a player of Legends of Valor.
+ */
 public class GameLVPlayer {
     private String playerName;
     private TeamHero teamHero;

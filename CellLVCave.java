@@ -1,3 +1,6 @@
+/**
+ * A Class representing a cave cell in Legends of Valor.
+ */
 public class CellLVCave extends CellLV {
     private double agilityBonus;
     Printer pr = new Printer();
@@ -13,6 +16,6 @@ public class CellLVCave extends CellLV {
     }
 
     public void removeBuff(Hero hero) {
-        hero.setAgility(hero.getAgility() * (1.0/1.15));
+        hero.setAgility(hero.getAgility() * (1.0/(1+agilityBonus)));
     }
 }

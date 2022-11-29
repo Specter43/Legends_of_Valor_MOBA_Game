@@ -1,3 +1,6 @@
+/**
+ * A Class representing an inaccessible cell in Legends of Valor.
+ */
 public class CellLVInaccessible extends CellLV {
     Printer pr = new Printer();
 

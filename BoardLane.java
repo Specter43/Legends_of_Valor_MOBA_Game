@@ -1,8 +1,11 @@
+/**
+ * A class representing a lane in a board of Legends of Valor
+ */
 public class BoardLane {
     private int laneWidth;
     private int h;
     private int w;
-    private Cell[][] laneCells;
+    private CellLV[][] laneCells;
 
     public BoardLane(int laneWidth, int h, int w) {
         this.laneWidth = laneWidth;

@@ -1,3 +1,6 @@
+/**
+ * A Class representing a hero nexus cell in Legends of Valor.
+ */
 public class CellLVHeroNexus extends CellLVNexus{
     Printer pr = new Printer();
 

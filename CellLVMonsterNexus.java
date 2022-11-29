@@ -1,3 +1,6 @@
+/**
+ * A Class representing a monster nexus cell in Legends of Valor.
+ */
 public class CellLVMonsterNexus extends CellLVNexus {
     Printer pr = new Printer();
 

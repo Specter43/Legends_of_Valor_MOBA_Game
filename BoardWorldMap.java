@@ -1,7 +1,7 @@
 import java.util.*;
 
 /**
- * A Class representing a world map for Legends: Monsters and Heroes game.
+ * A Class representing a world map for Legends of Valor game.
  */
 
 public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunction {
@@ -31,16 +31,15 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         this._boardCellHeight = 2;
         this._boardCellWidth = 4;
         this.laneWidth = 2;
-        this.numCreature = 0;
+        this.numCreature = (w+1)/3;
         this.inaccessibleWidth = 1;
         this.bushPercentage = 0.05;
         this.cavePercentage = 0.05;
         this.koulouPercentage= 0.05;
-        int teamSize = (w+1)/3;
-        this.heroPositions = new int[teamSize][];
-        this.heroOriginalPos = new int[teamSize][];
-        this.monsterPositions = new int[teamSize][];
-        this.monsterOriginalPos = new int[teamSize][];
+        this.heroPositions = new int[numCreature][];
+        this.heroOriginalPos = new int[numCreature][];
+        this.monsterPositions = new int[numCreature][];
+        this.monsterOriginalPos = new int[numCreature][];
         for (int i = 0; i < (w+1)/3; i++) {
             this.heroPositions[i] = new int[]{h, i*3};
             this.heroOriginalPos[i] = new int[]{h, i*3};
@@ -64,9 +63,6 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
         return heroPositions;
     }
     public int getNumCreature() {return numCreature; }
-    public int[][] getMonsterPositions() {
-        return monsterPositions;
-    }
 
     /**
      * Initialize an empty world map.
@@ -95,10 +91,6 @@ public class BoardWorldMap<T extends CellLV> extends Board implements BoardFunct
     public void initializeWorld() {
         int topRow = 1;
         int bottomRow = _boardCellHeight*getHeight()-1;
-        if (getWidth() % 3 == 0)
-            numCreature = getWidth() / 3;
-        else
-            numCreature = getWidth() / 3 + 1;
         int[] heroNexusColPos = new int[numCreature * 2];
         int[] monsterNexusColPos = new int[numCreature * 2];
         int index = 0;

@@ -1,3 +1,6 @@
+/**
+ * A Class representing a koulou cell in Legends of Valor.
+ */
 public class CellLVKoulou extends CellLV {
     private double strengthBonus;
     Printer pr = new Printer();
@@ -13,6 +16,6 @@ public class CellLVKoulou extends CellLV {
     }
 
     public void removeBuff(Hero hero) {
-        hero.setStrength(hero.getStrength() * (1.0/1.15));
+        hero.setStrength(hero.getStrength() * (1.0/(1+strengthBonus)));
     }
 }

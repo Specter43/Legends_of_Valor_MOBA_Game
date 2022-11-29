@@ -1,3 +1,6 @@
+/**
+ * A Class representing a bush cell in Legends of Valor.
+ */
 public class CellLVBush extends CellLV {
     private double dexterityBonus;
     Printer pr = new Printer();
@@ -13,6 +16,6 @@ public class CellLVBush extends CellLV {
     }
 
     public void removeBuff(Hero hero) {
-        hero.setDexterity(hero.getDexterity() * (1.0/1.15));
+        hero.setDexterity(hero.getDexterity() * (1.0/(1+dexterityBonus)));
     }
 }

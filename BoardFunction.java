@@ -3,6 +3,5 @@
  */
 public interface BoardFunction {
     void initializeBoard();
-
     void printBoard();
 }

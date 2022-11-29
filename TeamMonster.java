@@ -16,7 +16,7 @@ public class TeamMonster extends Team<Monster> {
             level = 10;
         }
         // Read Files
-        LMHFileReader fileReader = new LMHFileReader();
+        LVFileReader fileReader = new LVFileReader();
         HashMap<String, List<String>> dragons = fileReader.readFile("Legends_Monsters_and_Heroes/Dragons.txt");
         HashMap<String, List<String>> spirits = fileReader.readFile("Legends_Monsters_and_Heroes/Spirits.txt");
         HashMap<String, List<String>> exoskeletons = fileReader.readFile("Legends_Monsters_and_Heroes/Exoskeletons.txt");

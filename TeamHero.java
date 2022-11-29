@@ -29,7 +29,7 @@ public class TeamHero extends Team<Hero> {
 
     public void initializeTeamHeroes() {
         // Read Files
-        LMHFileReader fileReader = new LMHFileReader();
+        LVFileReader fileReader = new LVFileReader();
         HashMap<String, List<String>> warriors = fileReader.readFile("Legends_Monsters_and_Heroes/Warriors.txt");
         HashMap<String, List<String>> sorcerers = fileReader.readFile("Legends_Monsters_and_Heroes/Sorcerers.txt");
         HashMap<String, List<String>> paladins = fileReader.readFile("Legends_Monsters_and_Heroes/Paladins.txt");

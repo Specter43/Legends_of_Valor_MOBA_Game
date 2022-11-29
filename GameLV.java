@@ -1,9 +1,8 @@
 import java.util.*;
-
 import static java.lang.System.exit;
 
 /**
- * A Class representing an instance of a Legends: Monsters and Heroes game.
+ * A Class representing an instance of a Legends of Valor game.
  */
 public class GameLV extends BattleTurnBasedGame {
     private static final HashMap<String, ArrayList<String>> GAMEINPUTMAPPING = new HashMap<String, ArrayList<String>>() {{
@@ -49,7 +48,7 @@ public class GameLV extends BattleTurnBasedGame {
         }
         // Initialize Markets once map confirmed
         if (confirmLine.equals("Y")) {
-            LMHFileReader fileReader = new LMHFileReader();
+            LVFileReader fileReader = new LVFileReader();
             HashMap<String, List<String>> allWeapons = fileReader.readFile("Legends_Monsters_and_Heroes/Weaponry.txt");
             HashMap<String, List<String>> allArmors = fileReader.readFile("Legends_Monsters_and_Heroes/Armory.txt");
             HashMap<String, List<String>> allPotions = fileReader.readFile("Legends_Monsters_and_Heroes/Potions.txt");
@@ -149,7 +148,7 @@ public class GameLV extends BattleTurnBasedGame {
                 }
 
                 // Teleport
-                if (moveLine.equals("t") || moveLine.equals("T")) {
+                else if (moveLine.equals("t") || moveLine.equals("T")) {
                     System.out.print("Where do you want to teleport? 1-" + currentWorldMap.getNumCreature() + ": ");
                     String targetLine = in.nextLine();
                     int targetLine_int = stringToInt(targetLine, in);
@@ -183,7 +182,7 @@ public class GameLV extends BattleTurnBasedGame {
                 }
 
                 // Quit game
-                if (moveLine.equals("q") || moveLine.equals("Q")) {
+                else if (moveLine.equals("q") || moveLine.equals("Q")) {
                     exit(0);
                 }
 
@@ -232,13 +231,12 @@ public class GameLV extends BattleTurnBasedGame {
         teamMonster.initializeMonsterTeam(currentHeroTeam.highestLevel(), 1);
 
         // Initialize Battle Queue
-        QueueBattle queueBattle = new QueueBattle(currentHeroTeam, teamMonster, heroIndex);
-        this.currentQueueBattle = queueBattle;
+        this.currentQueueBattle = new QueueBattle(currentHeroTeam, teamMonster, heroIndex);
 
         // Battle takes turns
         Hero currentHero = currentHeroTeam.getTeamMembers().get(heroIndex);
         while (currentHero.getHP() > 0 && !teamMonster.allMonstersFainted()) {
-            ArrayList<Object> currentRole = queueBattle.nextTurn();
+            ArrayList<Object> currentRole = currentQueueBattle.nextTurn();
             if (currentRole.get(0).equals("Hero")) {
                 if (currentHero.getHP() > 0) {
                     System.out.printf("\nIt's " + pr.GREEN + "%s"  + pr.RESET + "'s turn!\n\n", currentHero.getName());
