@@ -40,7 +40,7 @@ public class GameLV extends BattleTurnBasedGame {
         System.out.println(pr.RED_BG + "N" + pr.RESET + " : This represents an enemy nexus, monster teams spawn here.");
         System.out.println(pr.WHITE_BG + "X" + pr.RESET + " : This represents terrains of the world that have seen no one crossing them over the eons.");
         System.out.println(pr.GREEN + "''" + pr.RESET + ": This represents an unknown place, your team MAY encounter a battle once stepped in.");
-        System.out.print("Do you think this is a reasonable world to play? Enter N to regenerate a world, Y to adventure: ");
+        System.out.print("Do you think this is a reasonable world to play? Enter " + pr.RED + "N to regenerate a world" + pr.RESET + ", " + pr.GREEN + "Y to adventure: " + pr.RESET);
         String confirmLine = in.nextLine();
         while (!confirmLine.equals("Y") && !confirmLine.equals("N")) {
             System.out.print("That did not look like a valid choice, please re-enter Y/N: ");
@@ -215,6 +215,7 @@ public class GameLV extends BattleTurnBasedGame {
             }
             // Monster at nexus
             if (currentWorldMap.monsterAtHeroNexus(i)) {
+                currentWorldMap.printBoard();
                 System.out.println(pr.RED + "Your Nexus has been destroyed!" + pr.RESET);
                 setGameOver(true);
                 return "Game Over";
@@ -401,6 +402,7 @@ public class GameLV extends BattleTurnBasedGame {
         // Regain health and mana and Gain experience and gold
         currentHero.setExperience(currentHero.getExperience()+(2*teamMonster.getTeamSize()));
         System.out.printf(pr.GREEN + "%s"  + pr.RESET + " has gained %d experience!\n", currentHero.getName(), 2*teamMonster.getTeamSize());
+        // Hero alive
         if (currentHero.getHP() > 0) {
             //Regain 10% HP and MP at end of each round
             currentHero.setHP(currentHero.getHP() * 1.1);
@@ -410,7 +412,12 @@ public class GameLV extends BattleTurnBasedGame {
             System.out.print(pr.GREEN + currentHero.getName() + pr.RESET + " has finished the turn! Regain HP and MP by 10%.\n");
             currentHero.setGold(currentHero.getGold() + currentHeroTeam.highestLevel()*100);
             System.out.printf(pr.GREEN + "%s"  + pr.RESET + " has gained %d gold!\n", currentHero.getName(), currentHeroTeam.highestLevel()*100);
-        } else {
+
+            // Remove monster
+            currentWorldMap.removeMonster(heroIndex);
+        }
+        // Hero fainted
+        else {
             // Revive
             System.out.printf(pr.GREEN + "%s" + pr.RESET + " has respawned!\n", currentHero.getName());
             currentHero.setHP(300);
@@ -419,7 +426,6 @@ public class GameLV extends BattleTurnBasedGame {
         currentHero.levelUp();
 
         // Set board
-        currentWorldMap.removeMonster(heroIndex);
         currentWorldMap.printBoard();
     }
 
