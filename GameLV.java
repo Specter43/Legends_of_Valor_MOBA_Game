@@ -33,6 +33,7 @@ public class GameLV extends BattleTurnBasedGame {
         this.currentWorldMap.printBoard();
         System.out.println(pr.BLUE + "Welcome to this new world full of opportunity, danger, and of course, FUN! ENJOY!" + pr.RESET);
         System.out.println(pr.PURPLE + "H" + pr.RESET + " : This represents your teams and they will be starting at their Nexuses.");
+        System.out.println(pr.RED + "M" + pr.RESET + " : This represents monster in enemy teams and they will be starting at their Nexuses.");
         System.out.println(pr.GREEN + "B" + pr.RESET + " : This represents a bush area, teams here get a bonus of their dexterity.");
         System.out.println(pr.YELLOW + "C" + pr.RESET + " : This represents a cave area, teams here get a bonus of their agility.");
         System.out.println(pr.CYAN + "K" + pr.RESET + " : This represents a koulou area, teams here get a bonus of their strength.");
